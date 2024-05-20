@@ -12,12 +12,15 @@ using System.Runtime.CompilerServices;
 
 public class NewWordPacker : MonoBehaviour
 {
+
+// Setting Variables from both Unity Scene and inside script.
+
     GameSession gameSession;
-    
+    public TextMeshProUGUI displayWordClue;
     [SerializeField] TextMeshProUGUI displayWordText;
     [SerializeField] Animator displayWordAnim = null;
     [SerializeField] Animator displayPhraseAnim = null;
-    public TextMeshProUGUI displayWordClue;
+    
     AudioSource audioSource;
     [SerializeField] AudioClip letterSuccess;
     [SerializeField] AudioClip letterWrong;
@@ -31,7 +34,6 @@ public class NewWordPacker : MonoBehaviour
     [SerializeField] GameObject jetPodObject;
     [SerializeField] GameObject circleLookObject;
 
-
     private Timer timer;
     private DestroyerHandler destroyerHandler;
     private SpawnerDown spawnerDown;
@@ -43,8 +45,6 @@ public class NewWordPacker : MonoBehaviour
     private CountStart countStart;
     private ScrollBGCanvas scrollBGCanvas;
     ParticleSystem particleJetFire;
-
-
 
     private int wordsCompleted;
     private int wordsToComplete;
@@ -66,29 +66,23 @@ public class NewWordPacker : MonoBehaviour
     [SerializeField] Animator letterClueAnim;
 
     public Dictionary<string, string> activeDictionary;
-
-
     private Dictionary<string, string> semanticFieldsDict;
     List<int> storedChoices;
-
-
 
     public List<string> letterArray;
     public List<char> specialLetterArray;
     public List<char> wordChars;
     public List<char> wordCharsCheck;
     private List<char> wordCharsScores;
-
     private int wordCount;
     private int storeLetterIndex;
     private int randomWord;
     private string activeWordValue;
 
     private float feedbackTime = 0.05f;
-
+    
     Button letterClueButton;
     Button phraseClueButton;
-    
     
     private float feedbackClue = 0.05f;
 
@@ -99,7 +93,9 @@ public class NewWordPacker : MonoBehaviour
 
     void Start()
     {
-        //semanticFieldsDict.ElementAt(0).Key
+
+    // Setting References for variables in script when it starts.
+        
         gameSession = FindObjectOfType<GameSession>();
         carryOvers = FindObjectOfType<CarryOvers>();
         timer = FindObjectOfType<Timer>();
@@ -110,22 +106,17 @@ public class NewWordPacker : MonoBehaviour
 
         semanticFieldsDict = new Dictionary<string, string>();
         LoadDictionary("SemanticFields", semanticFieldsDict);
-        //Debug.Log(semanticFieldsDict.ElementAt(3).Key);
+        
         activeDictionary = new Dictionary<string, string>();
         LoadDictionaryMOD(carryOvers.GetChoiceString(), activeDictionary);
         storedChoices = new List<int>();
         storedChoices.Add(0);
-        //Debug.Log(activeDictionary.ElementAt(3).Key);
-        bossTV = FindObjectOfType<BossBehaviour>();
-
-        //bedroom = FindObjectOfType<Bedroom>();
+        
+        bossTV = FindObjectOfType<BossBehaviour>();      
         wordChecker = FindObjectOfType<WordChecker>();
         spawnerDown = FindObjectOfType<SpawnerDown>();
-
         imagePacker = FindObjectOfType<ImagePacker>();
-        //activeDictionary2 = bedroom.GetDictionaryBeginner();
-        //Debug.Log(activeDictionary.ElementAt(0).Key);
-
+        
         destroyerHandler = FindObjectOfType<DestroyerHandler>();
         scoreHandler = FindObjectOfType<ScoreHandler>();
         speedHandler = FindObjectOfType<SpeedHandler>();
@@ -139,7 +130,7 @@ public class NewWordPacker : MonoBehaviour
 
         FillCharArray();
         CreateUnderscores();
-        //Debug.Log(wordChecker.GetAlphabet());
+        
         
     }
 
@@ -158,18 +149,20 @@ public class NewWordPacker : MonoBehaviour
 
     private void NextWord()
     {
+        // Function gets word from dictionary and readies it for following functions.
+    
         displayWordClue.text = "";
 
         randomWord = UnityEngine.Random.Range(0, activeDictionary.Count);
-        //Debug.Log("There are " + activeDictionary.Count + "Words");
+        
         activeWord = activeDictionary.ElementAt(randomWord).Key.ToUpper();
-        //MÈtodo para el Image Packer
+        
+        // Image Packer gets image and updates canvas based on random word from JSON dictionary.
         imagePacker.GetImageKey(activeWord);
         imagePacker.GetImageValue();
         imagePacker.SetImageCanvas();
 
         activeDictionary.TryGetValue(activeWord.ToLower(), out activeWordValue);
-        //Debug.Log("The Word Value is " + activeWordValue);
         activeDictionary.Remove(activeDictionary.ElementAt(randomWord).Key);
         wordCount = activeWord.Length;
 
@@ -178,6 +171,8 @@ public class NewWordPacker : MonoBehaviour
 
     private void NextWordBoss()
     {
+        // Function gets Boss word from dictionary and readies it for following functions.
+    
         displayWordClue.text = "";
         activeDictionary.Clear();
         LoadDictionaryMOD(carryOvers.GetChoiceString() + "Boss", activeDictionary);
@@ -185,15 +180,13 @@ public class NewWordPacker : MonoBehaviour
 
         imagePacker.LoadBossDictIMG();
         randomWord = UnityEngine.Random.Range(0, activeDictionary.Count);
-        //Debug.Log("There are " + activeDictionary.Count + "Words");
         activeWord = activeDictionary.ElementAt(randomWord).Key.ToUpper();
-        //MÈtodo para el Image Packer
+        
         imagePacker.GetImageKey(activeWord);
         imagePacker.GetImageValue();
         imagePacker.SetImageCanvas();
 
         activeDictionary.TryGetValue(activeWord.ToLower(), out activeWordValue);
-        //Debug.Log("The Word Value is " + activeWordValue);
         activeDictionary.Remove(activeDictionary.ElementAt(randomWord).Key);
         wordCount = activeWord.Length;
 
@@ -202,6 +195,8 @@ public class NewWordPacker : MonoBehaviour
 
     private void FillCharArray()
     {
+        // Based on word count, it fills several chars array used later for comparing and filling letters, and also for clue system.
+    
         wordChars = activeWord.ToList();
         wordCharsCheck = activeWord.ToList();
         wordCharsScores = activeWord.ToList();
@@ -209,12 +204,13 @@ public class NewWordPacker : MonoBehaviour
         EliminateSpacesChar();
         EliminateSpacesCheck();
         EliminateSpacesSpecial();
-        //Debug.Log(new string(wordChars.ToArray())); Log para convertir lista de chars a string completo
 
 
     }
     private void CreateUnderscores()
     {
+         // Creates undescores seen in game and takes spaces into account.
+    
         letterArray = new List<string>();
         
 
@@ -223,7 +219,7 @@ public class NewWordPacker : MonoBehaviour
             letterArray.Add("");
         }
 
-        displayWordText.text = ""; //CLEAR EL TEXTO
+        displayWordText.text = "";  //Clears word display.
 
         for (int letters = 0; letters < wordCount; letters++)
         {
@@ -236,12 +232,6 @@ public class NewWordPacker : MonoBehaviour
             {
                 letterArray[letters] = "_";
             }
-            
-
-            //if (letters > 0)
-            //{
-            //    displayWordText.text += " ";
-            //}
 
             displayWordText.text += letterArray[letters];
 
@@ -251,9 +241,11 @@ public class NewWordPacker : MonoBehaviour
 
     public void CompareDestroyedLetter()
     {
+        // Compares if letter destroyed matches or not one of the letters of the displayed word.
+    
         if (gameSession.GetOnGoingBoss())
         {
-            //Debug.Log("ongoingBoss is " + gameSession.GetOnGoingBoss());
+            
             destroyerHandler.DisableTouch();
         }
         for (int letters = 0; letters < wordCharsCheck.Count; letters++)
@@ -262,7 +254,6 @@ public class NewWordPacker : MonoBehaviour
             {
                 storeLetterIndex = letters;
                 wordCharsCheck[storeLetterIndex] = '0' ;
-                //scoreHandler.EnableSendIt();
                 StartCoroutine(WaitAndChange());
 
                 return;
@@ -270,8 +261,6 @@ public class NewWordPacker : MonoBehaviour
 
             
         }
-        //Debug.Log("Not the same!");
-        //scoreHandler.EnableSendIt();
         StartCoroutine(WaitAndReduce());
     }
 
@@ -279,6 +268,10 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator WaitAndChange()
     {
+        // Checks first if the app is currently in a Boss Level or not.
+        // If compared letter matches, it provides audio and visual feedback (sfx and letter appears).
+        // It also checks if it was the last letter, which then proceeds to complete the word and call all pertinent functions.
+    
         yield return new WaitForSecondsRealtime(feedbackTime);
         PlayScoreGood();
 
@@ -288,20 +281,17 @@ public class NewWordPacker : MonoBehaviour
         {
             StartCoroutine(bossTV.PlaySuccessAnimation());
             
-            
         }
 
         if (underScoresCount == 1)
         {
-            //Debug.Log("Changing final Char.");
             ChangeFinalChar();
             yield break;
         }
-        //CHEQUEO SI FALTA UN UNDERSCORE EN ESTE MOMENTO, SI HAY M¡S DE UNO CHANGECORRECTCHAR, SI SOLO HAY UNO PASAMOS A OTRO M…TODO
+        
         
         if (underScoresCount > 1)
         { 
-        //Debug.Log("Changing not final Char.");
         
         ChangeCorrectChar();
         audioSource.PlayOneShot(letterSuccess);
@@ -324,10 +314,11 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator WaitAndReduce()
     {
+        // If compared letter is incorrect feedback is provided and score is reduced.
+    
         yield return new WaitForSecondsRealtime(feedbackTime);
         PlayScoreBad();
-
-
+        
         if (carryOvers.GetTagDH() == "BossTV")
         {
             StartCoroutine(bossTV.PlayFailAnimation());
@@ -345,10 +336,11 @@ public class NewWordPacker : MonoBehaviour
     private void ChangeCorrectChar()
     {
 
+        // When changing letters in char array after successful letter it checks for spaces.
+        // Spacebool determines if the current word has a space in between or not.
+
         if (spaceBool == true)
         {
-            //Debug.Log("space bool was true!");
-            //Debug.Log("the stored index is " + storeLetterIndex + " and the space index is " + spaceIndex);
 
             if (storeLetterIndex >= spaceIndex)
             {
@@ -379,14 +371,13 @@ public class NewWordPacker : MonoBehaviour
         //Debug.Log("letter " + letterChanged + " was removed.");
         UpdateSlots();
 
-        
-        //CheckUnderScores();
-
 
     }
 
     private void ChangeFinalChar()
     {
+        // Same as previous function but called on last letter
+    
         if (spaceBool == true)
         {
             //Debug.Log("space bool was true!");
@@ -418,7 +409,6 @@ public class NewWordPacker : MonoBehaviour
             letterChanged = wordChars[storeLetterIndex];
         }
 
-
         specialLetterArray.Remove(letterChanged);
         //Debug.Log("letter " + letterChanged + " was removed.");
         
@@ -426,12 +416,10 @@ public class NewWordPacker : MonoBehaviour
 
         if (carryOvers.GetTagDH() != "BossTV")
         {
-            //scoreHandler.EnableSendIt();
+            
             StartCoroutine(WaitAndComplete());
         }
-
-        //StartCoroutine(WaitAndComplete());
-        
+    
         if (carryOvers.GetTagDH() == "BossTV")
         {
             bossTV.EnableItIsDone();
@@ -446,11 +434,6 @@ public class NewWordPacker : MonoBehaviour
         displayWordText.text = "";
         for (int letters = 0; letters < wordCount; letters++)
         {
-
-            //if (letters > 0)
-            //{
-            //    displayWordText.text += " ";
-            //}
 
             displayWordText.text += letterArray[letters];
         }
@@ -481,7 +464,9 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator WaitAndComplete()
     {
-        yield return new WaitForSecondsRealtime(0); //estaba a feedback time pero lo he puesto a 0, no debe esperar dos veces
+        //Function that contributes to setting up the next word, it also checks if the requirements have been met to enter Boss Level.
+    
+        yield return new WaitForSecondsRealtime(0);
         underScoresCount = 0;
         audioSource.PlayOneShot(wordSuccess);
         audioSource.PlayOneShot(crowdClap);
@@ -490,7 +475,7 @@ public class NewWordPacker : MonoBehaviour
         scoreHandler.EnableSendIt();
         yield return new WaitForSeconds(0.0001f);
         destroyerHandler.DisableTouch();
-        //A—ADO MULTIPLIERBARINCREASE AQUÕ??
+        //A√ëADO MULTIPLIERBARINCREASE AQU√ç??
         scoreHandler.IncreaseMultiBar(); //ESTO
         speedHandler.IncreaseWordBar();
         speedHandler.CheckSpeedZone();
@@ -512,8 +497,6 @@ public class NewWordPacker : MonoBehaviour
             StartCoroutine(PlayTextAnimationBossOutro());
         }
 
-
-
     }
 
     private void CheckWordsCompleted()
@@ -528,7 +511,8 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator WaitAndCompleteBossKill()
     {
-        //yield return new WaitForSecondsRealtime(0); //estaba a feedback time pero lo he puesto a 0, no debe esperar dos veces
+        // Runs when the last letter in Boss Level is completed.
+        
         destroyerHandler.DisableTouch();
         //Debug.Log("You Killed the Boss!!!");
         underScoresCount = 0;
@@ -543,10 +527,6 @@ public class NewWordPacker : MonoBehaviour
         DisableGimmeScoreBoss();
         scoreHandler.DisableSendIt();
         
-
-
-
-        
         StartCoroutine(PlayTextAnimationBossOutro());
 
 
@@ -555,12 +535,12 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator PlayTextAnimation()
     {
+        // Animation played when finishing a word, during the animation certain features are disabled to prevent any exploits.
+    
         displayWordAnim.Play("wordSuccess", 0, 0.0f);
         wordChecker.DisableChecks();
 
         DisableClueButtons();
-        
-        
 
         yield return new WaitForSeconds(3);
         
@@ -582,7 +562,7 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator PlayTextAnimationBossIntro()
     {
-        
+        // Changes needed before entering Boss Level, some of the changes include pausing the wave and the countdown timer.
 
         displayWordAnim.Play("wordSuccess", 0, 0.0f);
         wordChecker.DisableChecks();
@@ -596,15 +576,10 @@ public class NewWordPacker : MonoBehaviour
 
         yield return StartCoroutine(RealBossIntro());
         
-        //AQUÕ OCURRE CAMBIO HACIA BOSS STAGE
-        //StartCoroutine(bossTV.BetweenWordsAnimation());
-        //yield return new WaitForSeconds(bossTV.GetAnimTime());
-
-        //StartCoroutine(bossTV.PlayFailAnimationOnly());
+        // Here starts change to Boss Level
 
         bossTV.GetReadyForBoss();
-        //gameSession.DisableActivateBoss();
-        //gameSession.ActivateOnGoingBoss();
+        
         while (bossTV.GetReadyBool() == true)
         {
             yield return null;
@@ -613,14 +588,12 @@ public class NewWordPacker : MonoBehaviour
         StartCoroutine(bossTV.BetweenWordsAnimation());
         yield return new WaitForSeconds(bossTV.GetAnimTime());
         
-        //yield return new WaitForSeconds(2f); //AQUÕ OCURRE ALGO RARO, EL STATIC DEJA DE VERSE Y EL NOISE SIGUE ACTIVO, AL A—ADIR M¡S ESPERA SE ARREGLA
         bossTV.EnableImageSlot();
         spaceBool = false;
         NextWordBoss();
         
         //Debug.Log("I finished NextWordBoss");
-        //TODO PARECE FUNCIONAR BIEN, FALTA DESACTIVAR TODOS LOS SPAWNS, HACER QUE EL BOSS FUNCIONE, 
-        //Y QUE AL DERROTARLO VUELVA A SU SITIO Y LA PARTIDA SIGA
+        
         FillCharArray();
         CreateUnderscores();
         wordChecker.EnableChecks();
@@ -642,6 +615,9 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator RealBossIntro()
     {
+        // The Boss Animation intro is a mix of unity animation tools and fine-tuned scripting.
+        // It also prevents any exploits or stability issues that may happen during the intro.
+    
         timer.ActivateTimerWait();
         letterClueButton.interactable = false;
         destroyerHandler.DisableTouch();
@@ -653,11 +629,6 @@ public class NewWordPacker : MonoBehaviour
         gameSession.StopMusic();
         warningAnim.Play("WarningFlash");
         
-        //add event at animation end on interface, increase counter from warningBehaviour
-        //pause speed bar
-        //set counter limit based on current speed
-        //once counter limit is reached, disable game object and proceed with rest of animation.
-        //playOneShotSound of Siren and Warning Voice on loop based on own counter too, at end of sound play check counter limit and stop if reach
         while (warningObject.activeSelf)
         {
             yield return null;
@@ -687,8 +658,7 @@ public class NewWordPacker : MonoBehaviour
         }
         bossTV.ResetTinker();
         gameSession.StopSFX();
-        //FALTAN:
-        //ANIMACI”N TVSTILL, EL JET VUELVE A SU SITIO, APAGAR FUEGO JET
+       
         bossTV.DisableImageSlot();
         yield return new WaitForSeconds(0.25f);
         gameSession.PlaySFXOnce("turnOnClip");
@@ -711,6 +681,8 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator PlayTextAnimationBossOutro()
     {
+        // Animation created along the manners of the previous function for when the Boss Level is completed.
+    
         timer.ActivateTimerWait();
         gameSession.PlayDefeatMusic();
         bossTV.PlayJetStill();
@@ -720,19 +692,19 @@ public class NewWordPacker : MonoBehaviour
         while (bossTV.GetMoveCenter())
         {
             ShakeAnything shakerTV = bossTV.gameObject.GetComponent<ShakeAnything>();
-            //shakerTV.MiniShakeTV();
+          
 
             Vector3 randomPos = bossTV.gameObject.transform.position +
             new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f));
             particleHandler.SpawnParticles("TinkerNoise", randomPos);
             gameSession.PlaySFXOnce("exploClip");
             yield return new WaitForSeconds(UnityEngine.Random.Range(0.2f, 0.8f));
-            //yield return null;
+            
         }
         gameSession.StopSFX();
         yield return new WaitForSeconds(bossTV.PlayFadeInSuccess());
         bossTV.ResetOnScreen();
-        yield return new WaitForSeconds(bossTV.PlayShakeOff()); //AQUÕ METÕ LOS SONIDOS DENTRO DE LA ANIMACI”N COMO EVENTOS
+        yield return new WaitForSeconds(bossTV.PlayShakeOff()); 
         yield return new WaitForSeconds(1f);
         bossTV.ShowVictory();
         gameSession.PlaySFXOnce("peaceClip");
@@ -756,8 +728,6 @@ public class NewWordPacker : MonoBehaviour
         StartCoroutine(bossTV.BetweenWordsAnimation());
         yield return new WaitForSeconds(bossTV.GetAnimTime());
         bossTV.DisableItIsDone();
-        
-        
         
         SetPreviousDictionary();
         NextWord();
@@ -787,36 +757,12 @@ public class NewWordPacker : MonoBehaviour
 
         underScoresCount = specialLetterArray.Count;
          //Debug.Log(underScoresCount + " Underscores Remaining");
-        //var count = 0;
-
-        //for (int letters = 0; letters < wordChars.Count; letters++)
-        //{
-        //    if (letterArray[letters] == "_")
-        //    {
-        //        count++;
-        //    }
-        //}
-
-        //underScoresCount = count;
-        //Debug.Log(underScoresCount + " Underscores Remaining");
-    }
-
-
-    public void ShowPhraseClue()
-    {
-        if (scoreHandler.DecreaseClueMulti() == true)
-        {
-            
-            StartCoroutine(PhraseClueCoroutine());
-        }
-        else
-        {
-            // play audio que dice no se puede por no tener multiplier
-        }
     }
 
     public void ShowLetterClue()
     {
+        //When pressing on the Letter Clue button, it shows one of the word's letters at the cost of the user's score.
+    
         if (scoreHandler.DecreaseCluePoints() == true)
         {
 
@@ -827,13 +773,16 @@ public class NewWordPacker : MonoBehaviour
         {
             scrollBGCanvas.ButtonAnimation(letterClueButton.gameObject);
             audioSource.PlayOneShot(letterClueNo);
-            // AquÌ meter la animaciÛn de no se puede, se puede poner grayscale y ya est·
+           
         }
     }
 
 
     private IEnumerator LetterClueCoroutine()
     {
+        // Function that handles filling one letter in the word.
+        // It also checks for spaces when doing so.
+
         CountUnderscores();
         yield return new WaitForSecondsRealtime(feedbackClue);
 
@@ -899,8 +848,6 @@ public class NewWordPacker : MonoBehaviour
                     }
 
                 }
-
-            
 
                 //Debug.Log("there are " + underScoresCount + " underscores.");
 
@@ -981,28 +928,16 @@ public class NewWordPacker : MonoBehaviour
         }
     }
 
-    private IEnumerator PhraseClueCoroutine()
-    {
-        yield return new WaitForSecondsRealtime(feedbackTime);
-        StartCoroutine(PlayPhraseClueAnimation());
-        displayWordClue.text = activeWordValue;
-    }
-
-
-    private IEnumerator PlayPhraseClueAnimation()
-    {
-        displayPhraseAnim.Play("PhraseClue", 0, 0.0f);
-        
-        yield return new WaitForSeconds(5);
-
-        displayPhraseAnim.Play("PhraseClueFadeOut", 0, 0.0f);
-
-        
+// Here should be a phrase clue function that handles phrases that help the user remember the word such as "I eat the soup with the _____",
+// This helps the user remember that the word in question is "spoon", it's called Semantic cueing.
+       
     }
 
 
     private IEnumerator WaitAndCompleteLetterClue()
     {
+        // If the user completes the word with the clue button, he doesn't get as much score and a different sfx.
+        
         yield return new WaitForSecondsRealtime(0);
         PlayScoreBad();
         underScoresCount = 0;
@@ -1025,8 +960,11 @@ public class NewWordPacker : MonoBehaviour
         }
     }
 
+ // Handles enabling and disabling clue button and updating interface.
+
     private void DisableClueButtons()
     {
+       
 
         phraseClueButton.enabled = false;
         letterClueButton.enabled = false;
@@ -1057,8 +995,7 @@ public class NewWordPacker : MonoBehaviour
         scoreTextAnim.Play("ScoreBad", -1, 0.0f);
     }
 
-    private void SetPreviousDictionary() //PROPORCIONAR LOS NOMBRES DE TODOS LOS DICCIONARIOS A TRAV…S DE UN ARCHIVO, Y CUANDO QUIERA VACIAR Y LLENAR,
-        //SE—ALO HACIA UN ÕNDICE
+    private void SetPreviousDictionary() 
     {
         activeDictionary.Clear();
         LoadDictionaryMOD(carryOvers.GetChoiceString(), activeDictionary);
@@ -1076,21 +1013,6 @@ public class NewWordPacker : MonoBehaviour
                 spaceBool = true;
             }
 
-
-
-            //int charToCheck = 0;
-            //while (charToCheck<27)
-            //{
-            //    if (wordChars[letters] != wordChecker.GetAlphabet()[charToCheck])
-            //    {
-            //        charToCheck++;
-            //    }
-            //    if (wordChars[letters] == wordChecker.GetAlphabet()[charToCheck])
-            //    {
-            //        charToCheck = 0;
-            //        break;
-            //    }
-            //}
 
         }
     }
@@ -1134,7 +1056,7 @@ public class NewWordPacker : MonoBehaviour
         wordsCompleted = 0;
     }
 
-    //COSAS DE JSON
+    // Functions that handle dictionary loading, they contain all the words that will be used during the level, the words do not repeat and in the event that all words are completed (very unlikely) the level ends.
 
     private void LoadDictionary(string dictFileName, Dictionary<string, string> outputDict)
     {
