@@ -6,22 +6,35 @@ using UnityEngine.UI;
 
 public class CarryOvers : MonoBehaviour
 {
+   
+// Script modifies and stores all dynamic variables in the App. 
+
+    // Menu choices.
+
     private string choiceString = "";
     private string backgroundString = "";
     private string themeString = "";
     private string diffString = "";
     private string choiceStringSans = "";
     private int currentScene;
-
-    Options options;
+    
     private string activeDifficulty;
     private string storedTextDiff = "";
     private string[] splitChoiceCheck;
+
+    // Miscellaneous0
+    
     private string finalScore;
     bool comingFromLevel;
 
+    // Audio Sources.
+
     AudioSource musicSource;
     AudioSource soundSource;
+
+    // Options.
+
+    Options options;
     private Toggle musicToggle;
     private Slider musicSlider;
     private Toggle soundToggle;  
@@ -31,21 +44,25 @@ public class CarryOvers : MonoBehaviour
     private bool enteringOptions;
     private bool enableDKeys = false;
 
+    // DestroyerHandler variables.
+
     DestroyerHandler destroyerHandler;
     private string currentHitTag;
     private string currentLetter;
     private bool rightHanded;
+
+    // Current game coins.
 
     SwitchCoins switchCoins;
     private int currentCoins;
 
     AdsScript adsscript;
 
-
     private void Awake()
     {
+        // Prevents duplicate.
+    
         GameObject[] objs = GameObject.FindGameObjectsWithTag("CarryOvers");
-
 
         if (objs.Length > 1)
         {
@@ -55,8 +72,6 @@ public class CarryOvers : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         
-        
-
         destroyerHandler = FindObjectOfType<DestroyerHandler>();
         destroyerHandler.DisableTouch();
 
@@ -65,7 +80,6 @@ public class CarryOvers : MonoBehaviour
     }
 
 
-    // Start is called before the first frame update
     void Start()
     {
         
@@ -73,13 +87,13 @@ public class CarryOvers : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         
     }
 
-    ////// SCENE FUNCTIONS
+    // Scene functions for index setting.
 
 
     public void ResetCurrentScene()
@@ -131,6 +145,8 @@ public class CarryOvers : MonoBehaviour
         return currentScene;
     }
 
+    // Functions for getting or modifying menu choices.
+
     public string GetTheme()
     {
         return themeString;
@@ -148,11 +164,9 @@ public class CarryOvers : MonoBehaviour
         themeString = "";
         diffString = "";
         currentScene--;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("backgroundString is " + backgroundString);
     }
 
-    //ADD THEME AND DIFFICULTY
+    // Add theme and difficulty.
 
     public void AddBathroom()
     {
@@ -160,8 +174,7 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Bathroom";
         themeString = "Bathroom";
         currentScene = 2;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
+       
     }
 
     public void AddBedroom()
@@ -170,9 +183,7 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Bedroom";
         themeString = "Bedroom";
         currentScene = 2;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
-        //Debug.Log("backgroundString is " + backgroundString);
+        
     }
 
     public void AddKitchen()
@@ -181,8 +192,7 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Kitchen";
         themeString = "Kitchen";
         currentScene = 2;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
+        
     }
 
     public void AddBeginner()
@@ -190,8 +200,6 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Beginner";
         diffString = "Beginner";
         currentScene = 3;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
         choiceStringSans = choiceString;
     }
 
@@ -200,8 +208,6 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Intermediate";
         diffString = "Intermediate";
         currentScene = 3;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
         choiceStringSans = choiceString;
     }
 
@@ -210,8 +216,6 @@ public class CarryOvers : MonoBehaviour
         choiceString += "Advanced";
         diffString = "Advanced";
         currentScene = 3;
-        //Debug.Log("currentscene is " + currentScene);
-        //Debug.Log("choiceString is : " + choiceString);
         
         choiceStringSans = choiceString;
     }
@@ -223,16 +227,12 @@ public class CarryOvers : MonoBehaviour
         diffString = "";
         choiceString += themeString;
         backgroundString += themeString;
-        //Debug.Log("choiceString is : " + choiceString);
         currentScene = 2;
-        //Debug.Log("backgroundString is " + backgroundString);
-        //Debug.Log("currentscene is " + currentScene);
     }
 
     public void SetSceneOne()
     {
         currentScene = 1;
-        //Debug.Log("currentscene is " + currentScene);
     }
 
     public string GetChoiceString()
@@ -245,7 +245,6 @@ public class CarryOvers : MonoBehaviour
     {
         backgroundString = "";
         choiceString ="";
-        //Debug.Log("choiceString has been cleared");
     }
 
     public void ChangeDiffEasy()
@@ -271,7 +270,7 @@ public class CarryOvers : MonoBehaviour
         return activeDifficulty;
     }
 
-    //SOUND MANAGER
+    // Manages sound variables.
 
     public void SetOptionsReferences()
     {
@@ -291,8 +290,6 @@ public class CarryOvers : MonoBehaviour
         leftHandedToggle = GameObject.Find("Left-Handed Toggle").GetComponent<Toggle>();
         rightHandedToggle = GameObject.Find("Right-Handed Toggle").GetComponent<Toggle>();
         StartCoroutine(SetHDListeners());
-        
-
 
         //Debug.Log("The Music Name is: " + musicSource.clip.name);
         
@@ -311,17 +308,13 @@ public class CarryOvers : MonoBehaviour
 
         if (musicToggle.isOn == false)
         {
-            musicSource.Pause();
-            //musicToggle.isOn = true;
-            
+            musicSource.Pause(); 
 
         }
 
         if (musicToggle.isOn == true)
         {
-            musicSource.UnPause();
-            //musicToggle.isOn = false;
-            
+            musicSource.UnPause();   
 
         }
     }
@@ -333,17 +326,13 @@ public class CarryOvers : MonoBehaviour
         if (soundToggle.isOn == false)
         {
             soundSource.Pause();
-            //musicToggle.isOn = true;
-
-
+            
         }
 
         if (soundToggle.isOn == true)
         {
             soundSource.UnPause();
             soundSource.Play();
-            //musicToggle.isOn = false;
-
 
         }
     }
@@ -357,7 +346,6 @@ public class CarryOvers : MonoBehaviour
     {
         soundSource.volume = soundSlider.value;
 
-        
 
         if(!soundSource.isPlaying && soundToggle.isOn == true && enteringOptions == false)
         {
@@ -365,6 +353,8 @@ public class CarryOvers : MonoBehaviour
         }
         
     }
+
+    // Stores variable that changes app session based on user's dominant hand (Accessibility option).
 
     public void SetRightHanded()
     {
@@ -405,7 +395,7 @@ public class CarryOvers : MonoBehaviour
     }
 
 
-    // LOAD AND SAVE SETTINGS
+    // Section that loads and saves settings.
 
     public void LoadSettingsAtStart()
     {
@@ -458,9 +448,6 @@ public class CarryOvers : MonoBehaviour
         musicSource.volume = PlayerPrefs.GetFloat("musicVolume");
         soundSource.volume = PlayerPrefs.GetFloat("soundVolume");
 
-        //PlayerPrefs.SetString("activeLevelDifficulty", "bgrLevel.LevelBeginner");
-        //"imtLevel.LevelIntermediate"
-        //"advLevel.LevelAdvanced"
 
         if (!PlayerPrefs.HasKey("activeLevelDifficulty"))
         {
@@ -494,11 +481,6 @@ public class CarryOvers : MonoBehaviour
         storedTextDiff = PlayerPrefs.GetString("activeTextDifficulty");
         
 
-
-
-        //PlayerPrefs.SetInt("rightHanded", 1);
-        //rightHanded = true;
-
         if (!PlayerPrefs.HasKey("rightHanded"))
         {
             PlayerPrefs.SetInt("rightHanded", 1);
@@ -520,7 +502,7 @@ public class CarryOvers : MonoBehaviour
 
     public void LoadSettingsAtOptions()
     {
-        //PlayerPrefs.SetString("activeTextDifficulty", "Easy");
+       // Each time options menu is opened, last values from variables are loaded.
 
         if (!PlayerPrefs.HasKey("activeTextDifficulty"))
         {
@@ -548,8 +530,6 @@ public class CarryOvers : MonoBehaviour
         }
 
         enteringOptions = true;
-        //musicToggle.isOn = PlayerPrefs.GetInt("musicmute") == 0; SUPUESTA MAGIA NEGRA QUE NO FUNCIONA
-        //soundToggle.isOn = PlayerPrefs.GetInt("soundmute") == 0;
         musicSlider.value = PlayerPrefs.GetFloat("musicVolume");
         soundSlider.value = PlayerPrefs.GetFloat("soundVolume");
         
@@ -591,7 +571,6 @@ public class CarryOvers : MonoBehaviour
     public void SaveSettings()
     {
         PlayerPrefs.SetString("activeLevelDifficulty", activeDifficulty);
-        //storedTextDiff = options.GetCurrentDiffText();
         PlayerPrefs.SetString("activeTextDifficulty", storedTextDiff);
         PlayerPrefs.SetFloat("musicVolume", musicSlider.value);
         PlayerPrefs.SetFloat("soundVolume", soundSlider.value);
@@ -611,8 +590,6 @@ public class CarryOvers : MonoBehaviour
         {
             PlayerPrefs.SetInt("soundmute", 0);
         }
-        //PlayerPrefs.SetInt("musicmute", musicToggle.isOn ? 1 : 0);   MAS MÁGIA NEGRA QUE NO VA
-        //PlayerPrefs.SetInt("soundmute", soundToggle.isOn ? 1 : 0);
         soundSource.clip = null;
 
         if (leftHandedToggle.isOn == true)
@@ -631,7 +608,6 @@ public class CarryOvers : MonoBehaviour
     public void SaveSettingsFromGame()
     {
         PlayerPrefs.SetString("activeLevelDifficulty", activeDifficulty);
-        //storedTextDiff = options.GetCurrentDiffText();
         PlayerPrefs.SetString("activeTextDifficulty", storedTextDiff);
         PlayerPrefs.SetFloat("musicVolume", musicSlider.value);
         PlayerPrefs.SetFloat("soundVolume", soundSlider.value);
@@ -651,8 +627,6 @@ public class CarryOvers : MonoBehaviour
         {
             PlayerPrefs.SetInt("soundmute", 0);
         }
-        //PlayerPrefs.SetInt("musicmute", musicToggle.isOn ? 1 : 0);   MAS MÁGIA NEGRA QUE NO VA
-        //PlayerPrefs.SetInt("soundmute", soundToggle.isOn ? 1 : 0);
         soundSource.clip = null;
 
         if (leftHandedToggle.isOn == true)
@@ -668,7 +642,7 @@ public class CarryOvers : MonoBehaviour
         }
     }
 
-    //////////////DURING GAME
+    // Section handles settings loading and saving during app session.
 
     public void SetGameOptionsReferences()
     {
@@ -708,8 +682,6 @@ public class CarryOvers : MonoBehaviour
             soundToggle.isOn = false;
         }
 
-        //musicToggle.isOn = PlayerPrefs.GetInt("musicmute") == 0; SUPUESTA MAGIA NEGRA QUE NO FUNCIONA
-        //soundToggle.isOn = PlayerPrefs.GetInt("soundmute") == 0;
         musicSlider.value = PlayerPrefs.GetFloat("musicVolume");
         soundSlider.value = PlayerPrefs.GetFloat("soundVolume");
 
@@ -743,6 +715,8 @@ public class CarryOvers : MonoBehaviour
 
     public void SaveCoinsOnGet()
     {
+        // Coin amount is saved on obtaining through minigame.
+        
         switchCoins = FindObjectOfType<SwitchCoins>();
 
         if (switchCoins.GetCoinsInstantiated())
@@ -752,11 +726,6 @@ public class CarryOvers : MonoBehaviour
             currentCoins = PlayerPrefs.GetInt("coinsRemaining");
         }
        
-
-    }
-
-    private void SaveCoins()
-    {
 
     }
 
@@ -807,6 +776,8 @@ public class CarryOvers : MonoBehaviour
 
     public void SetComingFromLevel()
     {
+        // Determines if last scene was the app session.
+        
         comingFromLevel = true;
     }
 
@@ -831,6 +802,8 @@ public class CarryOvers : MonoBehaviour
         return finalScore;
     }
 
+    // This section involves getting information from "destroyerHandler" script.
+    
     public void TransferTagDH()
     {
         currentHitTag = destroyerHandler.GetDestroyedTag();
@@ -862,6 +835,8 @@ public class CarryOvers : MonoBehaviour
     {
         return PlayerPrefs.GetInt("coinsRemaining");
     }
+
+    // Hidden button section for debugging.
 
     public void DKeysInteract()
     {
