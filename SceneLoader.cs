@@ -6,9 +6,14 @@ using TMPro;
 using UnityEngine.UI;
 using System.Runtime.CompilerServices;
 
+// Script handles setup all references and variables of all Unity Scenes.
+
 public class SceneLoader : MonoBehaviour
 {
-    //GameObject dontdestroy;
+    // Setting up variables needed.
+
+    // Scene Objects.
+    
     CarryOvers carryOvers;
     ScrollBGCanvas scrollBGCanvas;
     DDBackAnimUI backgroundHandler;
@@ -19,19 +24,27 @@ public class SceneLoader : MonoBehaviour
     Canvas assocCanvas;
     GameObject[] assocCanvasArr;
 
+    // Options and Leaderboard menu.
+
     Button optionsConfirmButton;
     Button leaderConfirmButton;
     Button leader2ConfirmButton;
+
+    // Theme Menu.
 
     Button bedroomButton;
     Button bathroomButton;
     Button kitchenButton;
     Button backThemeButton;
 
+    // Difficulty Menu.
+
     Button beginnerButton;
     Button intermediateButton;
     Button advancedButton;
     Button backDiffButton;
+
+    // Starter and Choice Menu.
 
     Button backRevButton;
     TextMeshProUGUI themeChoice;
@@ -44,24 +57,24 @@ public class SceneLoader : MonoBehaviour
     Button startLevelButton;
     Button howToPlayButton;
     Button leaveTutorialButton;
+    Button backfromCreditsButton;
+    
+    // Exit level menu.
+    
+    Button exitLevelButton;
     
     [SerializeField] Sprite grayMenuButton;
     [SerializeField] Sprite grayCoinButton;
 
     TextMeshProUGUI coinNumberText;
 
-    Button backfromCreditsButton;
 
-    Button exitLevelButton;
+     
     
-    
-    
-    
-
     public void Awake()
     {
+        // Setting up initial references.
         
-        //dontdestroy = GameObject.Find("DontDestroyOnLoad");
         carryOvers = GameObject.Find("CarryOvers").GetComponent<CarryOvers>();
         scrollBGCanvas = FindObjectOfType<ScrollBGCanvas>();
         backgroundHandler = FindObjectOfType<DDBackAnimUI>();
@@ -69,26 +82,21 @@ public class SceneLoader : MonoBehaviour
         transitionHandler = FindObjectOfType<TransitionHandler>();
 
 
-
-
-
-
-
+        // On Script "Awake State" gets Scene index from script "carryOvers" and sets references according to that scene.
 
         if (carryOvers.GetCurrentScene() == 0)
         {
             if (transitionHandler.GetCanIntro())
             {
-                //Debug.Log("we got in! starting from intro");
+                // Game Intro
                 DestroyAllDontDestroyOnLoadObjects();
                 StartCoroutine(StartFromIntro());
                 transitionHandler.DisableIntro();
                 return;
             }
             currentCanvas = GameObject.FindGameObjectWithTag("CurrentCanvas").GetComponent<Canvas>();
-            //RESTABLECER REFERENCIA PARA EL BOTÓN START GAME
+            
             currentCanvas.worldCamera = mainCamera;
-            //if (bgNoirSprite == null) { Debug.Log("BUG: Forgot to enable BGNoir back!!!"); }
             bgNoirSprite = GameObject.Find("BGNoir").gameObject;
             
             if (bgNoirSprite != null)
@@ -100,31 +108,41 @@ public class SceneLoader : MonoBehaviour
 
             for (int i = 0; i < assocCanvasArr.Length; i++)
             {
+                // Establishes world camera for all involved canvases in scene.
+            
                 assocCanvas = assocCanvasArr[i].GetComponent<Canvas>();
                 assocCanvas.worldCamera = mainCamera;
             }
 
+                // Add event listeners for all menu buttons through script, which prevents it from being cleared on scene change.
+
             startGameButton = GameObject.Find("Start Game Button").GetComponent<Button>();
             startGameButton.onClick.AddListener(carryOvers.SetSceneOne);
             startGameButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(startGameButton.gameObject); });
+            
             optionsButton = GameObject.Find("Options Button").GetComponent<Button>();
             optionsButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(optionsButton.gameObject); });
+            
             leaderButton = GameObject.Find("Leaderboard Button").GetComponent<Button>();
             leaderButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(leaderButton.gameObject); });
+            
             coinsButton = GameObject.Find("Get Game Coins Button").GetComponent<Button>();
             coinsButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(coinsButton.gameObject); });
             coinsButton.onClick.AddListener(delegate { transitionHandler.GoToCoinsFromMenu(); });
+            
             creditsButton = GameObject.Find("Credits Button").GetComponent<Button>();
             creditsButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(creditsButton.gameObject); });
             creditsButton.onClick.AddListener(delegate { transitionHandler.GoToCreditsFromMenu(); });
+            
             howToPlayButton = GameObject.Find("How To Play Button").GetComponent<Button>();
             howToPlayButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(howToPlayButton.gameObject); });
+            
             leaveTutorialButton = GameObject.Find("Leave Tutorial Button").GetComponent<Button>();
             leaveTutorialButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(leaveTutorialButton.gameObject); });
 
-
-
         }
+
+            // Same procedure as previous for the rest of the scenes.
 
         if (carryOvers.GetCurrentScene() == 1)
         {
@@ -142,12 +160,15 @@ public class SceneLoader : MonoBehaviour
             bathroomButton = GameObject.Find("Bathroom Button").GetComponent<Button>();
             bathroomButton.onClick.AddListener(carryOvers.AddBathroom);
             bathroomButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(bathroomButton.gameObject); });
+            
             bedroomButton = GameObject.Find("Bedroom Button").GetComponent<Button>();
             bedroomButton.onClick.AddListener(carryOvers.AddBedroom);
             bedroomButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(bedroomButton.gameObject); });
+            
             kitchenButton = GameObject.Find("Kitchen Button").GetComponent<Button>();
             kitchenButton.onClick.AddListener(carryOvers.AddKitchen);
             kitchenButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(kitchenButton.gameObject); });
+            
             backThemeButton = GameObject.Find("Back Theme Button").GetComponent<Button>();
             backThemeButton.onClick.AddListener(carryOvers.BackErase);
             backThemeButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(backThemeButton.gameObject); });
@@ -169,12 +190,15 @@ public class SceneLoader : MonoBehaviour
             beginnerButton = GameObject.Find("Beginner Button").GetComponent<Button>();
             beginnerButton.onClick.AddListener(carryOvers.AddBeginner);
             beginnerButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(beginnerButton.gameObject); });
+            
             intermediateButton = GameObject.Find("Intermediate Button").GetComponent<Button>();
             intermediateButton.onClick.AddListener(carryOvers.AddIntermediate);
             intermediateButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(intermediateButton.gameObject); });
+            
             advancedButton = GameObject.Find("Advanced Button").GetComponent<Button>();
             advancedButton.onClick.AddListener(carryOvers.AddAdvanced);
             advancedButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(advancedButton.gameObject); });
+            
             backDiffButton = GameObject.Find("Back Difficulty Button").GetComponent<Button>();
             backDiffButton.onClick.AddListener(carryOvers.BackErase);
             backDiffButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(backDiffButton.gameObject); });
@@ -197,6 +221,7 @@ public class SceneLoader : MonoBehaviour
 
             themeChoice = GameObject.Find("Theme Choice").GetComponent<TextMeshProUGUI>();
             diffChoice = GameObject.Find("Difficulty Choice").GetComponent<TextMeshProUGUI>();
+            
             themeChoice.text = "Theme: " + carryOvers.GetTheme();
             diffChoice.text = "Word Difficulty: " + carryOvers.GetDiff();
 
@@ -204,35 +229,16 @@ public class SceneLoader : MonoBehaviour
             backRevButton.onClick.AddListener(carryOvers.BackEraseReview);
             backRevButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(backRevButton.gameObject); });
 
-            //AdsScript adsscript;
-            //adsscript = GameObject.Find("GoogleAds").GetComponent<AdsScript>();
+         
             startLevelButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(startLevelButton.gameObject); });
             startLevelButton.onClick.AddListener(delegate { transitionHandler.GoToGameFromReview(); });
-            //startLevelButton.onClick.AddListener(delegate{ adsscript.ShowInterstitial(); });
-
-            
-
-
-            //carryOvers.SetGameScene();
+           
         }
 
         if (carryOvers.GetCurrentScene() == 4)
         {
             currentCanvas = GameObject.FindGameObjectWithTag("CurrentCanvas").GetComponent<Canvas>();
             currentCanvas.worldCamera = mainCamera;
-
-            //assocCanvasArr = GameObject.FindGameObjectsWithTag("AssocCanvas");
-
-            //for (int i = 0; i < assocCanvasArr.Length; i++)
-            //{
-            //    assocCanvas = assocCanvasArr[i].GetComponent<Canvas>();
-            //    assocCanvas.worldCamera = mainCamera;
-            //}
-            //DestroyerHandler destroyerHandler;
-            //destroyerHandler = GameObject.Find("Main Camera").GetComponent<DestroyerHandler>();
-            //destroyerHandler.EnableTouch();
-
-            
 
         }
 
@@ -249,15 +255,12 @@ public class SceneLoader : MonoBehaviour
                 assocCanvas = assocCanvasArr[i].GetComponent<Canvas>();
                 assocCanvas.worldCamera = mainCamera;
             }
-            //optionsConfirmButton = GameObject.Find("Confirm Button").GetComponent<Button>();
-            //optionsConfirmButton.onClick.AddListener(GoToStartMenu);
+
             carryOvers.SetOptionsReferences();
             carryOvers.LoadSettingsAtOptions();
+            
             optionsConfirmButton = GameObject.Find("Confirm Options Button").GetComponent<Button>();
             optionsConfirmButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(optionsConfirmButton.gameObject); });
-
-            
-
 
         }
 
@@ -265,16 +268,6 @@ public class SceneLoader : MonoBehaviour
         {
             currentCanvas = GameObject.FindGameObjectWithTag("CurrentCanvas").GetComponent<Canvas>();
             currentCanvas.worldCamera = mainCamera;
-
-            //AdsScript adsscript;
-            //adsscript = GameObject.Find("GoogleAds").GetComponent<AdsScript>();
-            //adsscript.ShowRewardedVideo();
-
-
-            //optionsConfirmButton = GameObject.Find("Confirm Button").GetComponent<Button>();
-            //optionsConfirmButton.onClick.AddListener(GoToStartMenu);
-            //carryOvers.SetOptionsReferences();
-            //carryOvers.LoadSettingsAtOptions();
 
         }
 
@@ -290,6 +283,7 @@ public class SceneLoader : MonoBehaviour
                 assocCanvas = assocCanvasArr[i].GetComponent<Canvas>();
                 assocCanvas.worldCamera = mainCamera;
             }
+            
             leaderConfirmButton = GameObject.Find("Back To Menu 2").GetComponent<Button>();
             leaderConfirmButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(leaderConfirmButton.gameObject); });
 
@@ -298,6 +292,7 @@ public class SceneLoader : MonoBehaviour
         if (carryOvers.GetCurrentScene() == 9)
         {
             backgroundHandler.ActivateBackground();
+            
             currentCanvas = GameObject.FindGameObjectWithTag("CurrentCanvas").GetComponent<Canvas>();
             currentCanvas.worldCamera = mainCamera;
 
@@ -309,32 +304,30 @@ public class SceneLoader : MonoBehaviour
                 assocCanvas.worldCamera = mainCamera;
             }
             
-            //leader2ConfirmButton = GameObject.Find("Back To Menu Button").GetComponent<Button>();
-            //leader2ConfirmButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(leader2ConfirmButton.gameObject); });
         }
 
         if (carryOvers.GetCurrentScene() == 11)
         {
-            //backgroundHandler.ActivateBackground();
             currentCanvas = GameObject.FindGameObjectWithTag("CurrentCanvas").GetComponent<Canvas>();
             currentCanvas.worldCamera = mainCamera;
 
             backfromCreditsButton = GameObject.Find("Back from Credits").GetComponent<Button>();
-            //backfromCreditsButton.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(leaderConfirmButton.gameObject); });
-        }
 
+        }
 
     }
 
     private void Start()
+    
     {
+        // Gets saved coins from script "carryOvers", and determines if Coin Button is enabled or disabled.
+    
         if (carryOvers.GetCurrentScene() == 0)
         {
             Button getCoins = GameObject.Find("Get Game Coins Button").GetComponent<Button>();
             GetCoins();
             if (carryOvers.passItOverCoins() > 0)
             {
-                
                 getCoins.enabled = false;
             }
 
@@ -350,7 +343,7 @@ public class SceneLoader : MonoBehaviour
     public void SetListenerButton(Button buttonToSet)
     {
         buttonToSet.onClick.AddListener(delegate { scrollBGCanvas.ButtonAnimation(buttonToSet.gameObject); });
-        //Debug.Log("SceneLoader_listener added to button!");
+        //Debug.Log("SceneLoader_listener added to button");
     }
 
     private void GetCoins()
@@ -362,11 +355,40 @@ public class SceneLoader : MonoBehaviour
 
     }
 
+     // If coins are equal to 0, game can't be started until additional coins are obtained
+
+    private void CompareCoins()
+    {
+        Image startGameImage = GameObject.Find("Start Game Button").GetComponent<Image>();
+        startGameButton = GameObject.Find("Start Game Button").GetComponent<Button>();
+        coinsButton = GameObject.Find("Get Game Coins Button").GetComponent<Button>();
+        Image gameCoinsImage = GameObject.Find("Get Game Coins Button").GetComponent<Image>();
+
+        if (carryOvers.passItOverCoins() == 0)
+        {
+            startGameImage.sprite = grayMenuButton;
+            startGameButton.interactable = false;
+        }
+        else if(carryOvers.passItOverCoins() > 0)
+        {
+            gameCoinsImage.sprite = grayCoinButton;
+            coinsButton.interactable = false;
+        }
+        else if (carryOvers.passItOverCoins() < 0)
+        {
+            coinNumberText.text = "0";
+            startGameImage.sprite = grayMenuButton;
+            startGameButton.interactable = false;
+        }
+    }
+
     public void LoadNextScene()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex + 1);
     }
+
+    // Following functions are called to switch from one scene to another.
 
     public void GoToStart()
     {
@@ -374,16 +396,11 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene(0);
         carryOvers.ResetCurrentScene();
         carryOvers.ClearChoiceString();
-        //FindObjectOfType<GameSession>().RestartGame();
     }
 
     public void GoToTheme()
     {
-        
         SceneManager.LoadScene(1);
-
-        
-        
     }
 
     public void GoToDifficulty()
@@ -404,7 +421,6 @@ public class SceneLoader : MonoBehaviour
         backgroundHandler.DeactivateBackground();
         SceneManager.LoadScene(4);
         carryOvers.SetGameScene();
-        
     }
 
     public void GoToOptions()
@@ -431,9 +447,6 @@ public class SceneLoader : MonoBehaviour
         carryOvers = GameObject.Find("CarryOvers").GetComponent<CarryOvers>();
         SceneManager.LoadScene(9);
         carryOvers.SetLeaderboard2Scene();
-        //Time.timeScale = 1.0f;
-        
-
         //Debug.Log("the current scene is " + carryOvers.GetCurrentScene());
         
     }
@@ -444,7 +457,6 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene(7);
         carryOvers.SetGameCoinsScene();
         GameObject.Find("BackgroundAnim").SetActive(false);
-        //Destroy(GameObject.Find("BackgroundAnim"));
         //Debug.Log("the current scene is " + carryOvers.GetCurrentScene());
 
     }
@@ -462,7 +474,7 @@ public class SceneLoader : MonoBehaviour
 
     public void GoToStartMenu2()
     {
-        //carryOvers.SaveSettings();
+        
         carryOvers.SaveCoinsOnGet();
         SceneManager.LoadScene(0);
         backgroundHandler.ActivateBackground();
@@ -523,7 +535,6 @@ public class SceneLoader : MonoBehaviour
     }
 
     
-
     public void DestroyAllDontDestroyOnLoadObjects()
     {
 
@@ -534,32 +545,5 @@ public class SceneLoader : MonoBehaviour
             Destroy(root);
 
     }
-
-
-    private void CompareCoins()
-    {
-        Image startGameImage = GameObject.Find("Start Game Button").GetComponent<Image>();
-        startGameButton = GameObject.Find("Start Game Button").GetComponent<Button>();
-        coinsButton = GameObject.Find("Get Game Coins Button").GetComponent<Button>();
-        Image gameCoinsImage = GameObject.Find("Get Game Coins Button").GetComponent<Image>();
-
-        if (carryOvers.passItOverCoins() == 0)
-        {
-            startGameImage.sprite = grayMenuButton;
-            startGameButton.interactable = false;
-        }
-        else if(carryOvers.passItOverCoins() > 0)
-        {
-            gameCoinsImage.sprite = grayCoinButton;
-            coinsButton.interactable = false;
-        }
-        else if (carryOvers.passItOverCoins() < 0)
-        {
-            coinNumberText.text = "0";
-            startGameImage.sprite = grayMenuButton;
-            startGameButton.interactable = false;
-        }
-    }
-
     
 }
