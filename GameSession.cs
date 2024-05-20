@@ -7,16 +7,14 @@ using TMPro;
 public class GameSession : MonoBehaviour
 {
 
-    private bool activateBoss = false;
-    private bool onGoingBoss = false;
-    private bool isAlive;
+// Script acts as nexus for logic during app session, accessing and sending information to other logic scripts such as "destroyerHandler",
+// "wordPacker", "spawners"...etc.
+
+    // Scene objects.
 
     DestroyerHandler destroyerHandler;
     CarryOvers carryOvers;
     BackgroundHandler backgroundHandler;
-    CountStart countStart;
-    AdsScript adsscript;
-    
     NewWordPacker wordPacker;
     SpawnerDown spawnerDown;
     SpawnerLeft spawnerLeft;
@@ -24,14 +22,27 @@ public class GameSession : MonoBehaviour
     BGRLevel bgrLevel;
     IMTLevel imtLevel;
     ADVLevel advLevel;
-    RectTransform devilPosition;
-    Timer timer;
-    DDBackAnimUI ddBackAnimUI;
     SpeedHandler speedHandler;
-   
+
+    // Bools.
+
+    private bool activateBoss = false;
+    private bool onGoingBoss = false;
+    private bool isAlive;
+
+
+    // Miscellaneous.
+    
+    DDBackAnimUI ddBackAnimUI;
+    RectTransform devilPosition;
+    AdsScript adsscript;
+    
+    CountStart countStart;
+    Timer timer;
     int redCount;
     int timeCount;
-
+    
+    // Interface elements.
 
     TextMeshProUGUI displayWordText;
     TextMeshProUGUI scoreText;
@@ -42,8 +53,13 @@ public class GameSession : MonoBehaviour
     RectTransform wordBar;
     GameObject tv;
 
+    // Audio sources.
+
     AudioSource musicSource;
     AudioSource sfxSource;
+
+    // Audio clips from app session.
+    
     [SerializeField] AudioClip easyClip;
     [SerializeField] AudioClip mediumClip;
     [SerializeField] AudioClip hardClip;
@@ -74,22 +90,18 @@ public class GameSession : MonoBehaviour
     [SerializeField] AudioClip timeClip;
     
 
-
-
-
-
     void Start()
     {
+
+        // Setting up variable references.
+    
         countStart = FindObjectOfType<CountStart>();
         countStart.DisablePause();
-        //activeDifficulty = "bgrLevel.LevelBeginner()";
-        //activateBoss = true;
+        
         destroyerHandler = destroyerHandler = GameObject.Find("Main Camera").GetComponent<DestroyerHandler>();
         backgroundHandler = FindObjectOfType<BackgroundHandler>();
         carryOvers = FindObjectOfType<CarryOvers>();
         backgroundHandler.ChooseYourBackground(carryOvers.GetBackgroundString());
-        //destroyerHandler.EnableTouch();
-        //adsscript = GameObject.Find("GoogleAds").GetComponent<AdsScript>();
         wordPacker = FindObjectOfType<NewWordPacker>();
         countStart = FindObjectOfType<CountStart>();
         spawnerDown = FindObjectOfType<SpawnerDown>();
@@ -103,20 +115,10 @@ public class GameSession : MonoBehaviour
         musicSource = GameObject.Find("Background Music").GetComponent<AudioSource>();
         sfxSource = GameObject.Find("Main Camera").GetComponent<AudioSource>();
 
-
-        //NO OLVIDAR QUE AL TERMINAR LA PARTIDA DEBE NO DEJARTE EXPLOTAR MÁS COSAS MIENTRAS MIRAS EL SCORE
-
-        //Usar Raycast de fondo para impedir tocar el resto de cosas al empezar partida!
-        ddBackAnimUI.EnableBlock();
-
-        //tkharbi9a para testeo
-        //destroyerHandler.EnableTouch();
+        ddBackAnimUI.EnableBlock();  // Blocking touch controls before countdown animation.
 
         speedHandler = FindObjectOfType<SpeedHandler>();
         speedHandler.WordBarDisable();
-
-
-
 
         displayWordText = GameObject.Find("Display Word Text Mesh Pro").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
@@ -130,60 +132,41 @@ public class GameSession : MonoBehaviour
         //Debug.Log("the position where devil will spawn is " + devilPosition.localPosition);
 
 
-
-
-
-
         if (carryOvers.GetRightHanded() == false)
         {
+            // Changes positioning of interface if left-handed is enabled.
+        
             Vector2 tvNewPosition = new Vector2(-5.25f, 2.75f);
             tv.transform.position = tvNewPosition;
+            
             Vector2 displayTextNewPosition = new Vector2(-525f, 45f);
             displayWordText.rectTransform.localPosition = displayTextNewPosition;
+            
             Vector2 scoreTextNewPosition = new Vector2(-515f, -48f);
             scoreText.rectTransform.localPosition = scoreTextNewPosition;
             scoreText.alignment = TextAlignmentOptions.Left;
+            
             Vector2 multiplierTextNewPosition = new Vector2(-395f, -128f);
             multiplierText.rectTransform.localPosition = multiplierTextNewPosition;
             multiplierText.alignment = TextAlignmentOptions.Left;
+            
             Vector2 multiplierBarNewPosition = new Vector2(-880f, -225f);
             multiplierBar.localPosition = multiplierBarNewPosition;
+            
             Vector2 clueButtonsNewPosition = new Vector2(-1425f, -4f);
             clueButtons.localPosition = clueButtonsNewPosition;
+            
             Vector2 wordBarTextNewPosition = new Vector2(-595f, -430f);
             wordBarText.rectTransform.localPosition = wordBarTextNewPosition;
+            
             Vector2 wordBarNewPosition = new Vector2(-905f, -500f);
             wordBar.localPosition = wordBarNewPosition;
+            
             devilPosition = GameObject.Find("SpawnDevilLeft").GetComponent<RectTransform>();
         }
 
-
-        //StartCoroutine(spawnerDown.TwoTwoFromLeft3());
-
-        //if (carryOvers.GetActiveDifficulty() == "bgrLevel.LevelBeginner()")
-        //{
-        //    StartCoroutine(bgrLevel.LevelBeginner());
-        //}
-
-        //if (carryOvers.GetActiveDifficulty() == "imtLevel.LevelIntermediate()")
-        //{
-        //    StartCoroutine(imtLevel.LevelIntermediate());
-        //}
-
-        //if (carryOvers.GetActiveDifficulty() == "advLevel.LevelAdvanced()")
-        //{
-        //    StartCoroutine(advLevel.LevelAdvanced());
-        //}
-
-        //adsscript.ShowInterstitial(); //SHOWS INTERSTITIAL AD!
-
-        //StartCoroutine(WaitThenStartCountDown()); TEST QUE HICE PARA QUE FUNCIONE ADS EN MOVIL
     }
 
-    //MUY PROBABLE QUE META PALABRAS DE NIVEL INTERMEDIO EN BOSS Y QUE NO SEAN MUY LARGAS, EN AVANZADO METER PALABRAS LARGAS PARA BOSS
-    //AUDIO FEEDBACK DE OBJETOS CUANDO SPAWNEAN
-
-    // Update is called once per frame
     void Update()
     {
         if (timer.GetCurrentTimer() <=10)
@@ -200,6 +183,8 @@ public class GameSession : MonoBehaviour
 
     public void StartTheGame()
     {
+        // Prerequisites before starting the game.
+    
         PlayMusic();
         ddBackAnimUI.DisableBlock();
         countStart.DisableBlock();
@@ -207,12 +192,12 @@ public class GameSession : MonoBehaviour
         speedHandler.WordBarEnable();
         timer.EnableTimer();
         StartSpawning();
-
-        
     }
 
     public void PlayMusic()
     {
+        // Sets music based on chosen app difficulty.
+    
         switch (PlayerPrefs.GetString("activeTextDifficulty"))
         {
             case "Easy":
@@ -232,6 +217,8 @@ public class GameSession : MonoBehaviour
         musicSource.Play();
         musicSource.loop = true;
     }
+
+    // Functions that handle music.
 
     public void StopMusic()
     {
@@ -284,6 +271,8 @@ public class GameSession : MonoBehaviour
         musicSource.Play();
         musicSource.loop = true;
     }
+
+    // Function that plays clips on request.
 
     public void PlaySFXOnce(string clip)
     {
@@ -343,8 +332,6 @@ public class GameSession : MonoBehaviour
                 sfxSource.clip = bulletClip;
                 sfxSource.Play();
                 break;
-                //sfxSource.PlayOneShot(bulletClip);
-                //return;
             case "tickScoreClip":
                 sfxSource.clip = tickScoreClip;
                 break;
@@ -387,10 +374,10 @@ public class GameSession : MonoBehaviour
         sfxSource.Stop();
     }
 
-
-
     private void StartSpawning()
     {
+        // Starts waves based on chosen difficulty.
+    
         if (carryOvers.GetActiveDifficulty() == "bgrLevel.LevelBeginner()")
         {
             StartCoroutine(bgrLevel.LevelBeginner());
@@ -407,10 +394,11 @@ public class GameSession : MonoBehaviour
         }
     }
 
-    
+    // The following IEnumerators pause prop waves while waiting for certain variables to change.
 
     public IEnumerator CheckForBoss()
     {
+    
         if (onGoingBoss == true)
         {
             yield return new WaitUntil(() => onGoingBoss == false);
@@ -428,10 +416,10 @@ public class GameSession : MonoBehaviour
 
     public IEnumerator HoldWavesAfterWordCompletion()
     {
-        //FALTA RELLENARSE PARA AÑADIRLA LUEGO
         yield return new WaitForSeconds(0f);
     }
 
+    // Miscellaneous functions for value getting, countdown handling and others.
 
     public bool GetActivateBoss()
     {
@@ -525,19 +513,12 @@ public class GameSession : MonoBehaviour
         timeCount++;
     }
 
-
-    public void RestartGame()
-    {
-
-    }
-
     public Vector2 GetDevilPosition()
     {
         //Debug.Log("devil spawned in position" + devilPosition.position);
         return devilPosition.position;
     }
-
-
+    
     public IEnumerator WaitThenStartCountDown()
     {
         yield return new WaitForSeconds(0.5f);
