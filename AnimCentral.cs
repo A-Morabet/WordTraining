@@ -7,7 +7,10 @@ using UnityEngine.Video;
 
 public class AnimCentral : MonoBehaviour
 {
-    //ScrollTitle2 scrollTitle2;
+    // Script handles animation transitions from one Canvas to another.
+
+    // Scene Objects References.
+   
     ScrollBGCanvas scrollBGCanvas;
     SeparateBHandler separateBHandler;
     SceneLoader sceneLoader;
@@ -18,14 +21,13 @@ public class AnimCentral : MonoBehaviour
     bool canPause;
 
 
+    // Canvas References from all Scenes.
+
     [SerializeField] GameObject toThemeCanvas;
     [SerializeField] GameObject toDiffCanvas;
     [SerializeField] GameObject toRevCanvas;
     [SerializeField] GameObject toOptionsCanvas;
     [SerializeField] GameObject toLeaderCanvas;
-
-
-
 
     [SerializeField] GameObject backThemeCanvas;
     [SerializeField] GameObject backDiffCanvas;
@@ -33,7 +35,7 @@ public class AnimCentral : MonoBehaviour
     [SerializeField] GameObject backOptionsCanvas;
     [SerializeField] GameObject backLeaderCanvas;
 
-
+    // Animators and animation clips.
 
     [SerializeField] Animator toThemeAnim;
     [SerializeField] Animator toThemeAnimCo;
@@ -61,7 +63,6 @@ public class AnimCentral : MonoBehaviour
     [SerializeField] Animator toLeaderAnimCo;
     [SerializeField] AnimationClip toLeaderCoClip;
 
-
     [SerializeField] Animator backThemeAnim;
     [SerializeField] Animator backThemeAnimCo;
     [SerializeField] AnimationClip backThemeClip;
@@ -86,6 +87,8 @@ public class AnimCentral : MonoBehaviour
     [SerializeField] AnimationClip startToTutorialClip;
     [SerializeField] AnimationClip startToTutorialBWClip;
 
+    // How to play section.
+
     VideoPlayer videoPlayer;
     [SerializeField] Image pauseImage;
     [SerializeField] AudioClip pauseSound;
@@ -93,24 +96,17 @@ public class AnimCentral : MonoBehaviour
     [SerializeField] GameObject darkTutorialObject;
     [SerializeField] Image bgAnimImage;
     
-
-
-
-    private void Awake()
-    {
-        
-        
-    }
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         ddBackAnimUI = FindObjectOfType<DDBackAnimUI>();
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
+        // Function used for how to play video pausing through touch controls.
+        
         if (canPause)
         {
 
@@ -150,28 +146,15 @@ public class AnimCentral : MonoBehaviour
         }
     }
 
-
     public IEnumerator AnimationCentral()
     {
+        // Main function that handles all animations, the clicked button passes itself to the function,
+        // and decides what animation to start.
+    
         scrollBGCanvas = FindObjectOfType<ScrollBGCanvas>();
         separateBHandler = FindObjectOfType<SeparateBHandler>();
 
         scrollBGCanvas.PlayWhoosh();
-        //if (scrollBGCanvas.ButtonClicked() == null)
-        //{
-        //    if (separateBHandler.ButtonClicked() == "Back To Menu Button")
-        //    {
-        //        Debug.Log("back to Start from Leader2");
-
-        //        backLeaderCanvas.SetActive(true);
-        //        backLeaderAnim.Play("BackLeader2");
-        //        backLeaderAnimCo.Play("BackLeaderCo");
-        //        yield return new WaitForSeconds(backLeaderCoClip.length);
-        //        sceneLoader = GetComponent<SceneLoader>();
-        //        sceneLoader.GoToStartEndScreen(0);
-        //        yield break;
-        //    }
-        //}
 
         if (scrollBGCanvas.ButtonClicked() == "Start Game Button")
         {
@@ -241,10 +224,6 @@ public class AnimCentral : MonoBehaviour
             sceneLoader.GoToReview();
             ddBackAnimUI.DisableBlock();
             yield break;
-            //sceneLoader = GetComponent<SceneLoader>();
-            //yield return new WaitForSeconds(0.5f);
-            //themeAnim.Play("ThemeRevAppear");
-            //diffAnim.Play("DiffRevAppear");
         }
 
         if (scrollBGCanvas.ButtonClicked() == "Back Review Button")
@@ -293,7 +272,6 @@ public class AnimCentral : MonoBehaviour
         {
 
             //Debug.Log("going to leaderboard");
-            
             toLeaderCanvas.SetActive(true);
             toLeaderAnim.Play("StartToLeader");
             toLeaderAnimCo.Play("StartToLeaderCo");
@@ -307,7 +285,6 @@ public class AnimCentral : MonoBehaviour
         if (scrollBGCanvas.ButtonClicked() == "Back To Menu")
         {
             //Debug.Log("back to Start from Leader");
-
             backLeaderCanvas.SetActive(true);
             backLeaderAnim.Play("BackLeader");
             backLeaderAnimCo.Play("BackLeaderCo");
@@ -323,7 +300,6 @@ public class AnimCentral : MonoBehaviour
         if (scrollBGCanvas.ButtonClicked() == "Back To Menu 2")
         {
             //Debug.Log("back to Start from Leader");
-
             backLeaderCanvas.SetActive(true);
             backLeaderAnim.Play("BackLeader");
             backLeaderAnimCo.Play("BackLeaderCo2");
@@ -377,9 +353,6 @@ public class AnimCentral : MonoBehaviour
             //Debug.Log("got out of the while loop!!!");
             BackToMenu();
 
-
-            
-
             yield break;
         }
 
@@ -389,7 +362,6 @@ public class AnimCentral : MonoBehaviour
             StopAllCoroutines();
             ddBackAnimUI.EnableBlock();
             videoPlayer = GameObject.Find("Video Player").GetComponent<VideoPlayer>();
-            //videoPlayer.loopPointReached -= BackToMenu;
             videoPlayer.Stop();
             darkTutorialObject.SetActive(true);
             bgAnimImage.enabled = true;
