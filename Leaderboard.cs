@@ -8,6 +8,10 @@ using Coffee.UIEffects;
 
 public class Leaderboard : MonoBehaviour
 {
+// Script handles the local app leaderboard, populating default values, book keeping...etc.
+
+    // Blueprint for Leaderboard.
+
     private GameObject entryContainer;
     private GameObject entryTemplate;
     private RectTransform templateTransform;
@@ -18,55 +22,68 @@ public class Leaderboard : MonoBehaviour
     private List<Transform> currentTransformList;
     private List<HighscoreEntry> highscoreEntryList;
 
-    
+    // Scores from end of session and saved ones.
 
     Highscores highscores;
     Highscores currentHighscore;
-    CarryOvers carryOvers;
+
+    //  Audio sources.
+
     AudioSource musicSource;
     AudioSource sfxSource;
-    ScrollRect scrollArea;
-    Animator scoreTextAnimator;
+    
+
+    // Scene Objects.
+    
     SceneLoader sceneLoader;
     TransitionHandler transitionHandler;
+    CarryOvers carryOvers;
+    ScrollRect scrollArea;
+    Animator scoreTextAnimator;
+    DropDown dropdown;
     [SerializeField] SeparateBHandler separateBHandler;
-    [SerializeField] AudioClip elevatorMusic;
     
     
     
-    private string lastScoreSeen;
+    int lastOptionValue; // Last option select in leaderboard.
+    private string lastScoreSeen; // Last obtained score on app session.
+    
+    // Bools.
+   
     private bool firstOpen;
     private bool templateListActive;
-    
     private bool isWritten;
-    //private string inputScore;
+
+    // Values associated to score.
 
     private string lockedChars;
-    //[SerializeField]  Button upButton;
-    //[SerializeField]  Button downButton;
-    //[SerializeField]  Button okButton;
-    //[SerializeField] TextMeshProUGUI initialsText;
-
     private int scoreToSave;
     private string dateToSave;
 
-    DropDown dropdown;
-    int lastOptionValue;
+
+    // Hidden button for Leaderboard resetting (debug).    
     Button deleteKeysButton;
 
+
+    // Clips and buttons
+    
+    [SerializeField] AudioClip elevatorMusic;
+    [SerializeField] AudioClip arrowsClick;
     [SerializeField] Button backToMenu;
     [SerializeField] Button restartButton;
-    [SerializeField] AudioClip arrowsClick;
-    
 
+    // Elements for initials writing
+    
     TextMeshProUGUI currentInitialsText;
     char[] alphabet;
     int currentChar;
 
+    
 
-    // Start is called before the first frame update
     void Awake()
     {
+        // References for Leaderboard Container and "carryOvers" script.
+        
         entryContainer = GameObject.Find("LeaderboardEntryContainer");
         containerTransform = entryContainer.GetComponent<RectTransform>();
 
@@ -74,7 +91,7 @@ public class Leaderboard : MonoBehaviour
         templateTransform = entryTemplate.GetComponent<RectTransform>();
         carryOvers = FindObjectOfType<CarryOvers>();
 
-
+        // Determines if hidden button will be enabled or not.
 
         if (carryOvers.DKeysState() == "Dkeys are UP") {
             GameObject deleteKeysObject;
@@ -91,23 +108,22 @@ public class Leaderboard : MonoBehaviour
                 //Debug.Log("deleteKeys was not found");
             }
         }
-
-        carryOvers = FindObjectOfType<CarryOvers>();
+       
         dropdown = GameObject.Find("Dropdown").GetComponent<DropDown>();
         scrollArea = GameObject.Find("ScrollArea").GetComponent<ScrollRect>();
         musicSource = GameObject.Find("Background Music").GetComponent<AudioSource>();
 
+        // Disables blueprint which is used to make a copy and populate it.
         
-
-
-
         entryTemplate.SetActive(false);
 
+        // Alphabet array used for initial writing.
+    
         alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789".ToCharArray();
         lockedChars = "";
 
 
-        // Comando para forzar default
+        // Commmand used for debug used alongside the hidden button.
 
         //PlayerPrefs.DeleteKey("FirstOpen");
 
@@ -118,43 +134,14 @@ public class Leaderboard : MonoBehaviour
             PlayerPrefs.SetString("FirstOpen", "");
         }
 
-        // LO QUE HAY QUE HACER:
-        // A) CUANDO SE ENCIENDA ESTE SCRIPT VA A COMPROBAR EL ULTIMO STRING VISTO EN DROPDOWN,
-        // HACER UN CHEQUEO DE SI EL ULTIMO STRING VISTO EXISTE, SI NO, POBLARLO
-        // LOADEAR HIGHSCORE BASADO EN ULTIMO STRING VISTO
-        // QUE APAREZCA OPCIÓN ULTIMO STRING VISTO SELECCIONADA EN DROPDOWN
-        // B) SI EL ÚLTIMO STRING VISTO ES NULL, AÑADIR STRING HIGHSCOREDEFAULT LIVINGROOM INTERMEDIATE
-        // HACER UN CHEQUEO DE SI EL LIVINGROOM INTERMEDIATE EXISTE, SI NO, POBLARLO
-        // LOADEAR HIGHSCORE BASADO EN DEFAULT
-        // QUE APAREZCA OPCIÓN LIVINGROOM INTERMEDIATE SELECCIONADA EN DROPDOWN
-        // C) SI CAMBIO OPCIÓN EN DROPDOWN A OTRA,
-        // HACER UN CHEQUEO DE SI EL STRING SELECCIONADO EXISTE, SI NO, POBLARLO
-        // LOADEAR HIGHSCORE BASADO EN STRING SELECCIONADO
-        // QUE APAREZCA OPCIÓN ULTIMO STRING VISTO SELECCIONADA EN DROPDOWN
-
-        // ASOCIAR EL DICCIONARIO Y DIFICULTAD ESCOGIDOS AL HIGHSCORE CORRESPONDIENTE
-        // QUE AL FINAL DE LA PARTIDA COMPRUEBE SI LA PUNTUACIÓN ES MAYOR QUE CUALQUIERA DE LOS SCORES EN EL HIGHSCORE ASOCIADO
-        // SI LA PUNTUACIÓN ES MENOR SALE MENU COMO PAUSA CON EL SCORE OBTENIDO CON LOS BOTONES VOLVER AL MENU O RESTART
-        // SI ES EL CASO EN LA VENTANA DE FINAL DE PARTIDA DONDE ENSEÑE EL SCORE OBTENIDO MOSTRAR NEW RECORD
-        // LLEVARTE A ESCENA COPIA DE LEADERBOARD EN LA QUE TE MUESTRA DONDE TE HAN ASIGNADO Y SALE TECLADO PARA PONER TUS INICIALES
-        // ELEGIR ABAJO Y VOLVER AL MENU O RESTART.
-
-        
-        // Comando para forzar por defecto
-
-        
-        //PlayerPrefs.DeleteKey("LastScoreSeen");
+        // By using PlayerPrefs, it checks if it's the first time the leaderboard is opened, populates it with default values if it is.
+        // Retrieves saved database if it's not.
 
         if (firstOpen == true)
         {
-            // Comando para forzar por defecto
-            //PlayerPrefs.DeleteKey("BedroomIntermediateMedium");
-            // Command json get list
             
-            //string jsonString = PlayerPrefs.GetString("BedroomIntermediateMedium");
-            //Highscores highscores = JsonUtility.FromJson<Highscores>(jsonString);
             CheckFirstOpen();
-            SortAndShow();
+            SortAndShow(); // Sorting algorithm for object from higher score to lower.
         }
 
         if (firstOpen == false)
@@ -200,6 +187,8 @@ public class Leaderboard : MonoBehaviour
 
     private void Start()
     {
+        // Establishes Music, Camera and disables "destroyerHandler" script used in app gameplay session.
+    
         musicSource.clip = elevatorMusic;
         musicSource.loop = true;
         musicSource.Play();
@@ -214,7 +203,9 @@ public class Leaderboard : MonoBehaviour
 
     private void CreateHighscoreEntryTransform (HighscoreEntry highscoreEntry, Transform container, List<Transform> transformList, List<GameObject> templateList)
     {
-  
+
+        // Function that populates Score Container from a series of HighScoreEntry objects
+        
         float templateHeight = 80f;
 
         RectTransform entryTransform = Instantiate(templateTransform, container);
@@ -229,20 +220,17 @@ public class Leaderboard : MonoBehaviour
 
         string name = highscoreEntry.name;
         entryTransform.Find("NameText").GetComponent<TextMeshProUGUI>().text = name;
-        //GameObject inputObject = entryTransform.Find("InputFieldScore").gameObject;
-        //
+        
         GameObject letterUpObject = entryTransform.Find("LetterUpButton").gameObject;
         GameObject letterDownObject = entryTransform.Find("LetterDownButton").gameObject;
         GameObject okButtonObject = entryTransform.Find("OkButton").gameObject;
         GameObject initialsTextObject = entryTransform.Find("InitialsText").gameObject;
 
-
+        // The following if statements determine which score on the Container is the latest one.
+        
         if (highscoreEntry.recent == false)
         {
             
-            //Debug.Log("this entry is not the record, disabling input field. Recent is " + highscoreEntry.recent);
-            //inputObject.SetActive(false);
-            //
             letterUpObject.SetActive(false);
             letterDownObject.SetActive(false);
             okButtonObject.SetActive(false);
@@ -251,25 +239,13 @@ public class Leaderboard : MonoBehaviour
 
         if (highscoreEntry.recent == true)
         {
-            //StartCoroutine(SelectNewHighScoreInput());
-            //TMP_InputField inputObjectScore = entryTransform.Find("InputFieldScore").GetComponent<TMP_InputField>();
+            // If it's the latest then adds initial writing buttons for saving purposes.
+            
             scrollArea.enabled = false;
-            //inputObjectScore.ActivateInputField();
-            //inputObjectScore.Select();
-            //inputObjectScore.contentType = TMP_InputField.ContentType.Name;
-            //Debug.Log("this entry is the record, enabling input field. Recent is " + highscoreEntry.recent);
-            //
             
             TextMeshProUGUI initialsText = initialsTextObject.GetComponent<TextMeshProUGUI>();
             currentInitialsText = initialsText;
             initialsText.text = "A";
-
-
-
-
-            //backToMenu = GameObject.Find("Back To Menu Button").GetComponent<Button>();
-            //restart = GameObject.Find("Restart Button").GetComponent<Button>();
-
 
             backToMenu.onClick.AddListener(delegate { carryOvers.ClearChoiceString(); });
             backToMenu.onClick.AddListener(delegate { separateBHandler.ButtonAnimation(backToMenu.gameObject); });
@@ -279,25 +255,24 @@ public class Leaderboard : MonoBehaviour
             backToMenu.interactable = false;
             if (restartButton != null) { restartButton.interactable = false; }
             
-
-
         }
 
         if (highscoreEntry.name == "___")
         {
+            // Sets character spacing for underscores underneath initials.
+        
             RectTransform underscores = entryTransform.Find("NameText").GetComponent<RectTransform>();
             underscores.anchoredPosition += new Vector2(0, 10f);
             entryTransform.Find("NameText").GetComponent<TextMeshProUGUI>().characterSpacing = 9;
         }
-
-            //ESTOY AQUÍ, ARREGLAR POSICIONAMIENTO DE _ _ _ PONERLE SPACING Y MIRAR LO DE QUE TE HAGA EDITAR DIRECTAMENTE
-            //POR QUÉ SALE VARIAS VECES EL INPUT FIELD
 
         int score = highscoreEntry.score;
         entryTransform.Find("ScoreText").GetComponent<TextMeshProUGUI>().text = score.ToString();
 
         if (score.ToString() == carryOvers.GetFinalScore() && highscoreEntry.recent == true)
         {
+
+            // Automatically scores to most recent score for initial writing.
             
             scoreToCenter = entryTransform.Find("ScoreText").GetComponent<RectTransform>();
             ScrollViewFocusFunctions.FocusOnItem(scrollArea, scoreToCenter);
@@ -312,11 +287,6 @@ public class Leaderboard : MonoBehaviour
         string date = highscoreEntry.date;
         entryTransform.Find("DateText").GetComponent<TextMeshProUGUI>().text = date.ToString();
 
-
-
-        // Set background visible odds and evens, easier to read
-        //entryTransform.Find("background").gameObject.SetActive(rank % 2 == 1);
-
         transformList.Add(entryTransform);
         templateList.Add(entryTransform.gameObject);
 
@@ -324,12 +294,15 @@ public class Leaderboard : MonoBehaviour
 
     public void CharDown()
     {
+        // Event function for Char Down button.
+    
         sfxSource.pitch = 1;
         sfxSource.PlayOneShot(arrowsClick);
-        //TextMeshProUGUI initialsText = GameObject.Find("LetterDownButton").GetComponent<TextMeshProUGUI>();
 
         if (currentChar == 34)
         {
+            // When reaching end of alphabet it starts from first letter
+            
             //Debug.Log("Resetting the whole loop from char down");
             currentChar = 0;
             currentInitialsText.text = lockedChars + alphabet[currentChar].ToString();
@@ -343,15 +316,15 @@ public class Leaderboard : MonoBehaviour
             currentInitialsText.text = lockedChars + alphabet[currentChar].ToString();
         }
 
-        
     }
 
     public void SetChar()
     {
+        // Event function for char set.
 
         sfxSource.pitch = 1.5f;
         sfxSource.PlayOneShot(arrowsClick);
-        //TextMeshProUGUI initialsText = GameObject.Find("LetterDownButton").GetComponent<TextMeshProUGUI>();
+
         if (currentInitialsText.textInfo.characterCount <= 3)
         {
             lockedChars += alphabet[currentChar].ToString();
@@ -362,6 +335,9 @@ public class Leaderboard : MonoBehaviour
 
             if ( currentInitialsText.textInfo.characterCount == 3)
             {
+                // When setting all chars, char buttons are disabled and buttons for either exiting to main menu,
+                // or playing another game are activated.
+            
                 currentInitialsText.text = lockedChars;
 
                 Button letterUp = GameObject.Find("LetterUpButton").GetComponent<Button>();
@@ -375,10 +351,8 @@ public class Leaderboard : MonoBehaviour
                 //Debug.Log("Max count achieved, activating buttons...");
 
                 backToMenu = GameObject.Find("Back To Menu Button").GetComponent<Button>();
-                //restartButton = GameObject.Find("Restart Button").GetComponent<Button>();
                 backToMenu.interactable = true;
-                //sceneLoader = FindObjectOfType<SceneLoader>();
-                //sceneLoader.SetListenerButton(backToMenu);
+                
                 if (restartButton != null) {
                 UIEffect restartGameEffect = restartButton.gameObject.GetComponent<UIEffect>();
                 if (carryOvers.GetRemainingCoins() <= 0) { restartButton.interactable = false; restartGameEffect.effectMode = EffectMode.Grayscale; }
@@ -402,6 +376,7 @@ public class Leaderboard : MonoBehaviour
 
     public void CharUp()
     {
+        // Event function for Char Up Button.
 
         sfxSource.pitch = 1;
         sfxSource.PlayOneShot(arrowsClick);
@@ -432,6 +407,7 @@ public class Leaderboard : MonoBehaviour
 
     private void CheckFirstOpen()
     {
+        // Populates default values and chooses default dropdown option.
         
         if (!PlayerPrefs.HasKey("BedroomIntermediateMedium"))
         {
@@ -453,7 +429,7 @@ public class Leaderboard : MonoBehaviour
                 new HighscoreEntry{ score = 10084, name = "RON", date= "14/10/2023", recent = false  },
                 new HighscoreEntry{ score = 36543, name = "POE", date= "28/11/2023", recent = false  },
             };
-            // Reload
+            
             highscores = new Highscores { highscoreEntryList = highscoreEntryList };
             currentHighscore = highscores;
             string json = JsonUtility.ToJson(highscores);
@@ -464,30 +440,22 @@ public class Leaderboard : MonoBehaviour
             //Debug.Log(PlayerPrefs.GetString("LastScoreSeen"));
             dropdown.ChangeOptionValue(13);
             PlayerPrefs.SetString("LastOptionValue", dropdown.GetOptionValue().ToString());
-            //Debug.Log("Option Nº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
+            //Debug.Log("Option NÂº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
             PlayerPrefs.Save();
-            //jsonString = PlayerPrefs.GetString("BedroomIntermediate");
-            //highscores = JsonUtility.FromJson<Highscores>(jsonString);
-            
+                        
         }
     }
 
     public void CheckDropDownChange(string dropDownOption)
     {
-        //PENSAR EN HACER UNA LISTA DE EASY MEDIUM Y HARD, Y QUE CUANDO SE CREE POR PRIMERA VEZ UNA LISTA DE CADA COSA
-        //QUE COJA ITEMS DE LA LISTA DE MANERA RANDOM Y ASÍ CADA LISTA ES DISTINTA DE LA OTRA
-
-        // Comando para forzar default
-
-        //PlayerPrefs.DeleteKey(dropDownOption);
-
+        
         if (PlayerPrefs.HasKey(dropDownOption))
         {
             //Debug.Log("Dropdown option IS populated, getting it now...");
             string jsonString = PlayerPrefs.GetString(dropDownOption);
             highscores = JsonUtility.FromJson<Highscores>(jsonString);
             PlayerPrefs.SetString("LastOptionValue", dropdown.GetOptionValue().ToString());
-            //Debug.Log("Option Nº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
+            //Debug.Log("Option NÂº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
             SortAndShow();
         }
 
@@ -499,7 +467,6 @@ public class Leaderboard : MonoBehaviour
 
             if (dropDownOption.Contains("Easy"))
             { 
-
                 highscoreEntryList = new List<HighscoreEntry>()
             {
                 new HighscoreEntry{ score = 52000, name = "HOM", date= "03/09/2023"  },
@@ -562,10 +529,8 @@ public class Leaderboard : MonoBehaviour
             lastScoreSeen = dropDownOption;
             PlayerPrefs.SetString("LastScoreSeen", dropDownOption);
             PlayerPrefs.SetString("LastOptionValue", dropdown.GetOptionValue().ToString());
-            //Debug.Log("Option Nº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
+            //Debug.Log("Option NÂº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
             PlayerPrefs.Save();
-            //jsonString = PlayerPrefs.GetString("BedroomIntermediate");
-            //highscores = JsonUtility.FromJson<Highscores>(jsonString);
             SortAndShow();
         }
         
@@ -573,7 +538,7 @@ public class Leaderboard : MonoBehaviour
 
     private void SortAndShow()
     {
-        // Sort list by score
+        // Function that sorts list by highest score, and proceeds to update Container interface.
 
         for (int i = 0; i < highscores.highscoreEntryList.Count; i++)
         {
@@ -606,16 +571,11 @@ public class Leaderboard : MonoBehaviour
             templateListActive = true;
         }
 
-        
-
-
         foreach (HighscoreEntry highscoreEntry in highscores.highscoreEntryList)
         {
             CreateHighscoreEntryTransform(highscoreEntry, containerTransform, highscoreEntryTransformList, highscoreCurrentTemplateList);
 
         }
-
-        
 
         SaveAfterShowing();
     }
@@ -650,7 +610,7 @@ public class Leaderboard : MonoBehaviour
         PlayerPrefs.SetString(carryOvers.GetChoiceString(), json);
         //Debug.Log(PlayerPrefs.GetString(carryOvers.GetChoiceString()));
         PlayerPrefs.SetString("LastOptionValue", dropdown.GetOptionValue().ToString());
-        //Debug.Log("Option Nº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
+        //Debug.Log("Option NÂº " + PlayerPrefs.GetString("LastOptionValue") + " saved.");
         PlayerPrefs.Save();
 
         
@@ -659,17 +619,17 @@ public class Leaderboard : MonoBehaviour
 
     private void AddHighscoreEntryDefault(int score, string name, string date)
     {
-        // Instance Entry
+        // Instances entry, then proceeds to load entire highscore to add the entry to it and finally save.
         HighscoreEntry highscoreEntry = new HighscoreEntry { score = score, name = name, date = date };
 
-        // Load Entire Highscore
+        
         string jsonString = PlayerPrefs.GetString("BedroomIntermediate");
         Highscores highscores = JsonUtility.FromJson<Highscores>(jsonString);
 
-        // Add new entry to it
+        
         highscores.highscoreEntryList.Add(highscoreEntry);
 
-        // Save changes
+       
         string json = JsonUtility.ToJson(highscores);
         PlayerPrefs.SetString("BedroomIntermediate", json);
         PlayerPrefs.Save();
@@ -677,17 +637,14 @@ public class Leaderboard : MonoBehaviour
 
     private void AddHighscoreEntry(int score, string name, string date)
     {
-        // Instance Entry
+        
         HighscoreEntry highscoreEntry = new HighscoreEntry { score = score, name = name, date = date};
 
-        // Load Entire Highscore
         string jsonString = PlayerPrefs.GetString("highscoretable");
         Highscores highscores = JsonUtility.FromJson<Highscores>(jsonString);
-
-        // Add new entry to it
+       
         highscores.highscoreEntryList.Add(highscoreEntry);
 
-        // Save changes
         string json = JsonUtility.ToJson(highscores);
         PlayerPrefs.SetString("highscoreTable", json);
         PlayerPrefs.Save();
@@ -695,13 +652,16 @@ public class Leaderboard : MonoBehaviour
 
     private class Highscores
     {
+        // Class that holds a list of classes/objects.
+    
         public List<HighscoreEntry> highscoreEntryList;
     }
 
     [System.Serializable]
     private class HighscoreEntry
     {
-        //just one entry
+        // Class/object holding one entry.
+        
         public int score;
         public string name;
         public string date;
@@ -713,9 +673,12 @@ public class Leaderboard : MonoBehaviour
         return firstOpen;
     }
 
+    
 
     public void DeleteAllKeys()
-    {
+    { 
+    // Button that resets all Leaderboard values.
+    
         PlayerPrefs.DeleteKey("FirstOpen");
         PlayerPrefs.DeleteKey("LastScoreSeen");
         PlayerPrefs.DeleteKey("LastOptionValue");
@@ -723,58 +686,20 @@ public class Leaderboard : MonoBehaviour
         PlayerPrefs.DeleteKey("coinsRemaining");
         PlayerPrefs.DeleteKey("activeLevelDifficulty");
 
-        
         dropdown.RemoveListener();
         for (int i = 0; i < dropdown.GetDropDownCount(); i++)
         {
-            //Debug.Log("Deleting Option Nº " + i +"...");
+            //Debug.Log("Deleting Option NÂº " + i +"...");
             PlayerPrefs.DeleteKey(dropdown.GiveOptionName(i));
         }
         dropdown.RestoreListener();
     }
 
-    //public void ReadStringInput(string str)
-    //{
-    //    inputScore = str;
-    //    Debug.Log("you have written " + inputScore + " inside the inputfield.");
-
-    //    if (inputScore.Length == 3)
-    //    {
-    //        inputFieldScore.interactable = false;
-    //        isWritten = true;
-    //        scrollArea.enabled = true;
-
-    //        Button backToMenu = GameObject.Find("Back To Menu Button").GetComponent<Button>();
-    //        Button restart = GameObject.Find("Restart Button").GetComponent<Button>();
-    //        backToMenu.enabled = true;
-    //        restart.enabled = true;
-
-    //        Debug.Log("Deactivating inputfield.");
-    //        SaveRealRecord();
-    //        OnlySort();
-    //        SaveAfterShowing();
-    //    } 
-        
-    // }
-
-    //private void SaveRealRecord()
-    //{
-    //    for (int i = 0; i < highscores.highscoreEntryList.Count; i++)
-    //    {
-    //        if (highscores.highscoreEntryList[i].name == "___")
-    //        {
-    //            Debug.Log("Found the blank entry, deleting it...");
-    //            highscores.highscoreEntryList.RemoveAt(i);
-    //            Debug.Log("Blank entry deleted, adding new real entry...");
-    //            highscores.highscoreEntryList.Add(new HighscoreEntry { score = scoreToSave, name = inputScore.ToUpper(), date = dateToSave, recent = false });
-    //        }
-
-    //    }
-        
-    //}
 
     private void SaveRealRecordText()
     {
+        // Function that saves record entry replacing the dummy one.
+        
         for (int i = 0; i < highscores.highscoreEntryList.Count; i++)
         {
             if (highscores.highscoreEntryList[i].name == "___")
@@ -789,19 +714,7 @@ public class Leaderboard : MonoBehaviour
 
     }
 
-    //public void ReselectInputfield()
-    //{
-    //    if (isWritten == false)
-    //    {
-    //        TMP_InputField inputObjectScore = GameObject.Find("InputFieldScore").GetComponent<TMP_InputField>();
-    //        inputObjectScore.ActivateInputField();
-    //        inputObjectScore.Select();
-
-    //    }
-
-    //}
-
-    
+   
 }
 
 
