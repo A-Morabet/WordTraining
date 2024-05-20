@@ -5,10 +5,23 @@ using UnityEngine;
 
 public class DestroyerHandler : MonoBehaviour
 {
+    // Script handles app session logic on prop destruction through touch controls and what ensues:
+    // p.e. score increase, prop destruction animation, letter filled in hangman section, boss level activation...etc.
+
+
+    // Variables for Scene Objects, destroyerHandler references itself so it's destroyed later in case there's duplicates.
+    
     private static DestroyerHandler destroyerHandler;
-
     private CarryOvers carryOvers;
+    NewWordPacker wordPacker;
+    SpeedHandler speedHandler;
+    ScoreHandler scoreHandler;
+    ParticleHandler particleHandler;
+    GameSession gameSession;
+    SpawnerLeft spawnerLeft;
+    SpawnerRight spawnerRight;
 
+    // Props and associated audioclips.
 
     [SerializeField] GameObject balloonEffect;
     [SerializeField] AudioClip balloonBurst;
@@ -33,6 +46,8 @@ public class DestroyerHandler : MonoBehaviour
 
     AudioSource audioSource;
 
+    // Scripts that dictate prop behaviour.
+
     private BalloonBehaviour balloon;
     private BalloonRedBehaviour balloonRed;
     private BalloonBlueBehaviour balloonBlue;
@@ -40,29 +55,25 @@ public class DestroyerHandler : MonoBehaviour
     private ClayBrownBehaviour clayBrown;
     private ClayRedBehaviour clayRed;
     private ShakeAnything shaker;
-    //private PowerUpTimerBehaviour powerUpTimer;
+
+    // Timer and Boss.
 
     private Timer timer;
     private BossBehaviour bossTV;
     
 
-
-    NewWordPacker wordPacker; //PRESTAR ATENCIÓN A ESTA REFERENCIA, EL RESTO DEL CÓDIGO VA BIEN
-    SpeedHandler speedHandler;
-    ScoreHandler scoreHandler;
-    ParticleHandler particleHandler;
-    GameSession gameSession;
-    SpawnerLeft spawnerLeft;
-    SpawnerRight spawnerRight;
-
-    private string destroyedLetter;
-    private string currentHitTag;
-    
+    // Miscellaneous.
 
     private bool touchEnabled;
+    private string destroyedLetter;
+    private string currentHitTag; 
+    private bool referencesSet;
+
 
     private void Awake()
     {
+        // Duplicate delete.
+    
         if (destroyerHandler == null)
         {
             destroyerHandler = this;
@@ -74,24 +85,12 @@ public class DestroyerHandler : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //GameObject[] objs = GameObject.FindGameObjectsWithTag("MainCamera");
-
-
-
-        //if (objs.Length > 1)
-        //{
-        //    //Destroy(GameObject.FindWithTag("TransitionHandler"));
-        //    Destroy(gameObject);
-
-        //}
-
-        //DontDestroyOnLoad((GameObject.FindWithTag("MainCamera")));
     }
-
-
 
     void Start()
     {
+        // Sets up references to variables.
+        
         carryOvers = FindObjectOfType<CarryOvers>();
         wordPacker = FindObjectOfType<NewWordPacker>();
         
@@ -106,11 +105,17 @@ public class DestroyerHandler : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
+        // Main function that handles destruction logic for all props during app session.
+        // Determines hit collider from touch controls and proceeds to apply specific prop logic.
+    
         if ( touchEnabled )
         {
+            if (!referencesSet){
+            // When touch is enabled references are set up again and bool prevents it to be loaded each frame
+            
             wordPacker = FindObjectOfType<NewWordPacker>();
             particleHandler = FindObjectOfType<ParticleHandler>();
             speedHandler = FindObjectOfType<SpeedHandler>();
@@ -122,6 +127,9 @@ public class DestroyerHandler : MonoBehaviour
             timer = FindObjectOfType<Timer>();
 
             wordPacker.setPackerReferences();
+
+            referencesSet = true;
+            }
 
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
@@ -146,7 +154,7 @@ public class DestroyerHandler : MonoBehaviour
 
                     //Debug.Log("The letter destroyed is " + balloon.textLetter.text);
                     audioSource.PlayOneShot(balloonBurst);
-                    //AudioSource.PlayClipAtPoint(balloonBurst, hit.transform.position, 1f);
+                    
                     particleHandler.SpawnParticles("Balloon", hit.transform.position);
                     Destroy(hit.transform.gameObject);
                     
@@ -215,9 +223,9 @@ public class DestroyerHandler : MonoBehaviour
                     }
                 if (hit.transform.tag == "ClayBrown")
                 {
-
-                   //Instantiate(balloonEffect, hit.transform.position, Quaternion.identity);
-                   clayBrown = hit.transform.GetComponent<ClayBrownBehaviour>();
+                    //Clay props move the opposite side on hit collision.
+                    
+                    clayBrown = hit.transform.GetComponent<ClayBrownBehaviour>();
 
                     if (hit.collider.name == "ClayBrownColliderRight" && clayBrown.GetDamageCount() < 3)
                     {
@@ -254,7 +262,6 @@ public class DestroyerHandler : MonoBehaviour
                             
                         }
                         return;
-
                     }
 
                     if (hit.transform.tag == "ClayRed")
@@ -309,30 +316,26 @@ public class DestroyerHandler : MonoBehaviour
 
                     if (hit.transform.tag == "PowerUpTimer")
                     {
+                        // Increases time on hit.
 
                         Instantiate(balloonEffect, hit.transform.position, Quaternion.identity);
                         Instantiate(timeBurst, hit.transform.position, Quaternion.identity);
                         gameSession.PlaySFXOnce("timeClip");
-                        //powerUpTimer = hit.transform.GetComponent<PowerUpTimerBehaviour>();
+                        
                         currentHitTag = hit.transform.tag;
                         carryOvers.TransferTagDH();
                         timer.IncreaseTimer();
-                        //gameSession.OneLessTimeCount();
-                        //if (gameSession.GetTimeCount() <= 0)
-                        //{
-                        //    gameSession.SetDestroyed();
-                        //    Debug.Log("timer has been set to destroyed");
-                        //    gameSession.ResetTimeCount();
-
-                        //}
+                        
                         Destroy(hit.transform.gameObject);
                         return;
-                        //AÑADIR FLOAT SCORE ENSEÑANDO CUÁNTO TIEMPO HA GANADO
+                        
 
                     }
 
                     if (hit.transform.tag == "BossTV" && gameSession.GetOnGoingBoss() == true)
                     {
+
+                        // Handles boss hit collision
 
                         Instantiate(balloonEffect, hit.transform.position, Quaternion.identity);
                         bossTV = GameObject.Find("TV").GetComponent<BossBehaviour>();
@@ -359,14 +362,7 @@ public class DestroyerHandler : MonoBehaviour
                         //Debug.Log("Nothing here");
                         return;
                     }
-            }
-
-
-
-
-
-
-            
+            }          
 
         }
         }
@@ -391,8 +387,11 @@ public class DestroyerHandler : MonoBehaviour
     }
 
     public void DisableTouch()
-    {
+    {    
+    // Disables touch controls and readies references to be set up again.
+    
         touchEnabled = false;
+        referencesSet = false;
     }
 
     public AudioClip GetTestSound()
@@ -403,26 +402,16 @@ public class DestroyerHandler : MonoBehaviour
     private void GimmeScore(Vector3 hitPosition)
     {
         StartCoroutine(GimmeTheScore(hitPosition));
-        //int scoreToShow = 0;
         
-        //while (scoreHandler.getSendIt() == false)
-        //{
-        //    Debug.Log("waiting for the score to come");
-            
-        //}
-
-        //if (scoreHandler.getSendIt() == true)
-        //{
-        //    scoreHandler.SendScore(scoreToShow);
-        //    Instantiate(floatPlus, hitPosition, transform.rotation);
-        //}
     }
 
     private IEnumerator GimmeTheScore(Vector3 hitPosition)
     {
+        // Waits for score to be processed from "scoreHandler" script and receives it,
+        // determines if score is positive or negative, and then modifies accordingly.
+    
         int scoreToShow = 0;
         yield return new WaitUntil(() => scoreHandler.getSendIt() == true);
-        //yield return new WaitForSeconds(feedbackTime);
         scoreToShow = scoreHandler.SendScore();
         //Debug.Log("getSendIt became true! the score to show is " + scoreToShow);
         //Debug.Log("the score to show is " + scoreToShow);
