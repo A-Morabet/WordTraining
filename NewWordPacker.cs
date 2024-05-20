@@ -16,10 +16,13 @@ public class NewWordPacker : MonoBehaviour
 // Setting Variables from both Unity Scene and inside script.
 
     GameSession gameSession;
+    private SpeedHandler speedHandler;
     public TextMeshProUGUI displayWordClue;
     [SerializeField] TextMeshProUGUI displayWordText;
     [SerializeField] Animator displayWordAnim = null;
     [SerializeField] Animator displayPhraseAnim = null;
+
+    // Audio clips and associated assets.
     
     AudioSource audioSource;
     [SerializeField] AudioClip letterSuccess;
@@ -34,6 +37,8 @@ public class NewWordPacker : MonoBehaviour
     [SerializeField] GameObject jetPodObject;
     [SerializeField] GameObject circleLookObject;
 
+    // App level scripts.
+
     private Timer timer;
     private DestroyerHandler destroyerHandler;
     private SpawnerDown spawnerDown;
@@ -44,30 +49,18 @@ public class NewWordPacker : MonoBehaviour
     private ParticleHandler particleHandler;
     private CountStart countStart;
     private ScrollBGCanvas scrollBGCanvas;
+    
+    // Fire particles from the Boss TV asset.
     ParticleSystem particleJetFire;
 
+    // Hangman section (underscores and word letters)
+    
     private int wordsCompleted;
     private int wordsToComplete;
     private string activeWord;
     private char letterChanged;
     private int spaceIndex;
     private bool spaceBool = false;
-
-    private BossBehaviour bossTV;
-    private bool canGimmeScoreBoss;
-    [SerializeField] GameObject warningObject;
-    [SerializeField] Animator warningAnim;
-    private WarningBehaviour warningBehaviour;
-    [SerializeField] Sprite clueDisabled;
-    [SerializeField] Sprite letterDisabled;
-    [SerializeField] Sprite clueEnabled;
-    [SerializeField] Sprite letterEnabled;
-    [SerializeField] Animator scoreTextAnim;
-    [SerializeField] Animator letterClueAnim;
-
-    public Dictionary<string, string> activeDictionary;
-    private Dictionary<string, string> semanticFieldsDict;
-    List<int> storedChoices;
 
     public List<string> letterArray;
     public List<char> specialLetterArray;
@@ -79,18 +72,45 @@ public class NewWordPacker : MonoBehaviour
     private int randomWord;
     private string activeWordValue;
 
-    private float feedbackTime = 0.05f;
+    private bool underScoresPresent;
+    private int underScoresCount;
+
+    // Boss and warning animations
+    
+    private BossBehaviour bossTV;
+    private bool canGimmeScoreBoss;
+        [SerializeField] GameObject warningObject;
+    [SerializeField] Animator warningAnim;
+    private WarningBehaviour warningBehaviour;
+
+    // Clue button and score text
+    
+    [SerializeField] Sprite clueDisabled;
+    [SerializeField] Sprite letterDisabled;
+    [SerializeField] Sprite clueEnabled;
+    [SerializeField] Sprite letterEnabled;
+    [SerializeField] Animator scoreTextAnim;
+    [SerializeField] Animator letterClueAnim;
+
+    // Dictionary 
+
+    public Dictionary<string, string> activeDictionary;
+    private Dictionary<string, string> semanticFieldsDict;
+    List<int> storedChoices;
+    
+    
+    // Button 
     
     Button letterClueButton;
     Button phraseClueButton;
     
+
+    // Feedback
+    
+    private float feedbackTime = 0.05f;
     private float feedbackClue = 0.05f;
 
-    private bool underScoresPresent;
-    private int underScoresCount;
-
-    private SpeedHandler speedHandler;
-
+    
     void Start()
     {
 
@@ -110,7 +130,7 @@ public class NewWordPacker : MonoBehaviour
         activeDictionary = new Dictionary<string, string>();
         LoadDictionaryMOD(carryOvers.GetChoiceString(), activeDictionary);
         storedChoices = new List<int>();
-        storedChoices.Add(0);
+        storedChoices.Add(0); 
         
         bossTV = FindObjectOfType<BossBehaviour>();      
         wordChecker = FindObjectOfType<WordChecker>();
@@ -125,6 +145,7 @@ public class NewWordPacker : MonoBehaviour
         letterClueButton = GameObject.Find("LetterClueButton").GetComponent<Button>();
 
         countStart = FindObjectOfType<CountStart>();
+
 
         NextWord();
 
@@ -219,7 +240,7 @@ public class NewWordPacker : MonoBehaviour
             letterArray.Add("");
         }
 
-        displayWordText.text = "";  //Clears word display.
+        displayWordText.text = "";  // Clears word display.
 
         for (int letters = 0; letters < wordCount; letters++)
         {
@@ -376,7 +397,7 @@ public class NewWordPacker : MonoBehaviour
 
     private void ChangeFinalChar()
     {
-        // Same as previous function but called on last letter
+        // Same as previous function but called when filling last word letter.
     
         if (spaceBool == true)
         {
@@ -464,7 +485,7 @@ public class NewWordPacker : MonoBehaviour
 
     private IEnumerator WaitAndComplete()
     {
-        //Function that contributes to setting up the next word, it also checks if the requirements have been met to enter Boss Level.
+        // Function that contributes to setting up the next word, it also checks if the requirements have been met to enter Boss Level.
     
         yield return new WaitForSecondsRealtime(0);
         underScoresCount = 0;
@@ -475,7 +496,6 @@ public class NewWordPacker : MonoBehaviour
         scoreHandler.EnableSendIt();
         yield return new WaitForSeconds(0.0001f);
         destroyerHandler.DisableTouch();
-        //AÑADO MULTIPLIERBARINCREASE AQUÍ??
         scoreHandler.IncreaseMultiBar(); //ESTO
         speedHandler.IncreaseWordBar();
         speedHandler.CheckSpeedZone();
@@ -501,6 +521,8 @@ public class NewWordPacker : MonoBehaviour
 
     private void CheckWordsCompleted()
     {
+        // Determines if Boss level will start based on amount of completed words.
+        
         if (wordsCompleted == wordsToComplete )
         {
             ResetWordsCompleted();
@@ -576,7 +598,7 @@ public class NewWordPacker : MonoBehaviour
 
         yield return StartCoroutine(RealBossIntro());
         
-        // Here starts change to Boss Level
+        // Here starts change to Boss Level.
 
         bossTV.GetReadyForBoss();
         
@@ -930,6 +952,7 @@ public class NewWordPacker : MonoBehaviour
 
 // Here should be a phrase clue function that handles phrases that help the user remember the word such as "I eat the soup with the _____",
 // This helps the user remember that the word in question is "spoon", it's called Semantic cueing.
+// This function will be developped after publish process.
        
     }
 
