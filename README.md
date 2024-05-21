@@ -12,7 +12,7 @@ Made with Unity and Adobe Suite.
 ## Summary
 
 Word Training is a mobile application made with the purpose of helping people develop their day-to-day english vocabulary in an engaging way.
-Project started around first-half of 2022, work was done a few hours on the weekends, then during the first-half of 2023 I picked up the pace
+Project started around first-half of 2022, work was done a few hours on the weekends, then during the first quarter of 2023 I picked up the pace
 and was able to complete the app during summer.
 App was made in the Unity Environment, more than 15.000 lines of C# code were written to define the App's logic, front-end and back-end aspects.
 
@@ -24,35 +24,33 @@ In the App, the user can:
 
 - Choose from three different vocabulary themes related to the house: Bedroom, Bathroom and Kitchen.
 - Select from three levels of Word Difficulty which sets the level of frequency of the words being presented...etc.
-- Adjust a series of options in the Options Menu such as 
-- Fee amount.
-- Patient's first name.
+- Adjust a series of options in the Options Menu such as App Difficulty which determines the types of props that are presented to the user, as well as Left-Handed Mode.
+- Play a Coin Minigame that provides him a series of "continues" after watching a video ad.
+- Watch a short video tutorial that explains the main mechanics of the App and a Credits Section.
 
-It will then proceed to create a list of dates that respect the
-conditions given by the user. The calendar is then rendered
-on a table alongside the patient's name, fees and total amount.
-Both calendar and table can be toggled off and the invoice can 
-also be printed with hidden buttons through the "Print Invoice" button.
+## Code samples
+
+This repository contains some of the scripts that the app relies on, their purpose in the repository is to showcase their construction and functionality:
+
+* "AnimCentral.cs" : This script has two functions: first it handles all transition animations from one menu canvas to another which is a total of 14. Secondly, it handles the video player logic in the How To Play Section.
+* "SceneLoader.cs" : Script sets up all variables and references whenever a scene is loaded, this includes button event listeners and scene objects.
+* "GameSession.cs" : This script acts as a nexus for all other game logic when user starts a level, it receives and sends information to all other logic-involved scripts. It also manages music and sound effects.
+* "DestroyerHandler.cs" : This script interfaces mainly with "GameSession" and "NewWordPacker", providing information on hit collision and extending prop behavior, p.ex. if the user touches a clay plate the script recognises it and applies its intended behavior: to lose one hitpoint and move to the opposite side from here it was touched. It has an additional function which is score display on hit position.
+* "NewWordPacker.cs" : Charged with handling word logic during playthrough. It is one of the "hearts" of the App since it handles many crucial gameplay-related functions such as word-picking and slicing, letter-comparing on hit, word filling, score assignment, word-related animations and the boss intro and outro animations.
+* "Leaderboard.cs" : Script handles the local App leaderboard, it creates a default JSON database for all themes and difficulty combinations the first time is opened. Each time the user reaches a highscore, it prompts the user to register his score on the chosen theme and difficulty. It also contains logic for score template display among other functions.
+* "CarryOvers.cs" : This script is charged with storing and setting all variables that are shared across all scripts as well as saving local settings such as sound volume, last picked difficulty, number of owned game coins...etc.
 
 ### Prerequisites
 
-No packages are needed to run this project locally.
+No packages are needed to run this project on mobile.
 
 ### Installation
 
-1. Clone the repo.
-   ```sh
-   git clone https://github.com/A-Morabet/invoice-generator-allied
-   ```
-2. Run live server in source code editor.
+<ins>Application is currently unavailable</ins> due to undergoing Google Play Publishing Process.
 
 ## Contact
 
 Amine Morabet - hey@aminemorabet.com
 
-Project Link: [https://A-Morabet.github.io/invoice-generator-allied](https://A-Morabet.github.io/invoice-generator-allied)
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-Link to gameplay video: https://aminemorabet.com/vids/portfolio-02.mp4
