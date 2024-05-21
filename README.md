@@ -18,8 +18,7 @@ App was made in the Unity Environment, more than 15.000 lines of C# code were wr
 
 During the App session the user is presented with a small television on the upper-right corner with a hangman section below it; the television shows
 the image of the item that the user must recognise and then hit the props containing the letters that form the item's word in any order until 
-he completes the word, then he is rewarded with additional points and the next word is presented shortly after. [Link with video that goes straight to gameplay](https://aminemorabet.com/vids/portfolio-02.mp4#t=100.5)
-The App Video demonstration can be watched from the beginning through the video link provided at the bottom.
+he completes the word, he then is rewarded with additional points and the next word is presented shortly after.</br><div align="middle"><a href="https://aminemorabet.com/vids/portfolio-02.mp4#t=0.1" target="__blank" align="middle">Video Demonstration</a></div></br>
 
 In the App, the user can:
 
