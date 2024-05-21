@@ -32,13 +32,13 @@ In the App, the user can:
 
 This repository contains some of the scripts that the app relies on, their purpose in the repository is to showcase their construction and functionality:
 
-* "AnimCentral.cs" : This script has two functions: first it handles all transition animations from one menu canvas to another which is a total of 14. Secondly, it handles the video player logic in the How To Play Section.
-* "SceneLoader.cs" : Script sets up all variables and references whenever a scene is loaded, this includes button event listeners and scene objects.
-* "GameSession.cs" : This script acts as a nexus for all other game logic when user starts a level, it receives and sends information to all other logic-involved scripts. It also manages music and sound effects.
-* "DestroyerHandler.cs" : This script interfaces mainly with "GameSession" and "NewWordPacker", providing information on hit collision and extending prop behavior, p.ex. if the user touches a clay plate the script recognises it and applies its intended behavior: to lose one hitpoint and move to the opposite side from here it was touched. It has an additional function which is score display on hit position.
-* "NewWordPacker.cs" : Charged with handling word logic during playthrough. It is one of the "hearts" of the App since it handles many crucial gameplay-related functions such as word-picking and slicing, letter-comparing on hit, word filling, score assignment, word-related animations and the boss intro and outro animations.
-* "Leaderboard.cs" : Script handles the local App leaderboard, it creates a default JSON database for all themes and difficulty combinations the first time is opened. Each time the user reaches a highscore, it prompts the user to register his score on the chosen theme and difficulty. It also contains logic for score template display among other functions.
-* "CarryOvers.cs" : This script is charged with storing and setting all variables that are shared across all scripts as well as saving local settings such as sound volume, last picked difficulty, number of owned game coins...etc.
+* <b>"AnimCentral.cs"</b> : This script has two functions: first it handles all transition animations from one menu canvas to another which is a total of 14. Secondly, it handles the video player logic in the How To Play Section.
+* <b>"SceneLoader.cs"</b> : Script sets up all variables and references whenever a scene is loaded, this includes button event listeners and scene objects.
+* <b>"GameSession.cs"</b> : This script acts as a nexus for all other game logic when user starts a level, it receives and sends information to all other logic-involved scripts. It also manages music and sound effects.
+* <b>"DestroyerHandler.cs"</b> : This script interfaces mainly with "GameSession" and "NewWordPacker", providing information on hit collision and extending prop behavior, p.ex. if the user touches a clay plate the script recognises it and applies its intended behavior: to lose one hitpoint and move to the opposite side from here it was touched. It has an additional function which is score display on hit position.
+* <b>"NewWordPacker.cs"</b> : Charged with handling word logic during playthrough. It is one of the "hearts" of the App since it handles many crucial gameplay-related functions such as word-picking and slicing, letter-comparing on hit, word filling, score assignment, word-related animations and the boss intro and outro animations.
+* <b>"Leaderboard.cs"</b> : Script handles the local App leaderboard, it creates a default JSON database for all themes and difficulty combinations the first time is opened. Each time the user reaches a highscore, it prompts the user to register his score on the chosen theme and difficulty. It also contains logic for score template display among other functions.
+* <b>"CarryOvers.cs"</b> : This script is charged with storing and setting all variables that are shared across all scripts as well as saving local settings such as sound volume, last picked difficulty, number of owned game coins...etc.
 
 ### Prerequisites
 
