@@ -7,7 +7,7 @@ using TMPro;
 public class GameSession : MonoBehaviour
 {
 
-// Script acts as nexus for logic during app session, accessing and sending information to other logic scripts such as "destroyerHandler",
+// Script acts as nexus for logic during game session, accessing and sending information to other logic scripts such as "destroyerHandler",
 // "wordPacker", "spawners"...etc.
 
     // Scene objects.
