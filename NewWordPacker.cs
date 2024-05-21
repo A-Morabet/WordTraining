@@ -12,8 +12,9 @@ using System.Runtime.CompilerServices;
 
 public class NewWordPacker : MonoBehaviour
 {
+    // Script handles word logic during user playthroughs.
 
-// Setting Variables from both Unity Scene and inside script.
+    // Setting Variables from both Unity Scene and inside script.
 
     GameSession gameSession;
     private SpeedHandler speedHandler;
