@@ -7,7 +7,7 @@
 </div>
 </br>
 
-Made with Unity and Adobe Suite.
+Made with Unity Engine and Adobe Suite.
 
 ## Summary
 
