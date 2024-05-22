@@ -40,7 +40,7 @@ This repository contains some of the scripts that the app relies on, their purpo
 * <b>"Leaderboard.cs"</b> : Script handles the local App leaderboard, it creates a default JSON database for all themes and difficulty combinations the first time is opened. Each time the user reaches a highscore, it prompts the user to register his score on the chosen theme and difficulty. It also contains logic for score template display among other functions.
 * <b>"CarryOvers.cs"</b> : This script is charged with storing and setting all variables that are shared across all scripts as well as saving local settings such as sound volume, last picked difficulty, number of owned game coins...etc.
 
-<b>Additional Notes:</b> Other unmentioned features include a score multiplier system that rewards flawless execution and a speed system that dynamically balances difficulty by increasing the game's speed the better the user performs and slowing it now if the user struggles too much during the playthrough.
+<i>Additional Notes:</i> Other unmentioned features include a score multiplier system that rewards flawless execution and a speed system that dynamically balances difficulty by increasing the game's speed the better the user performs and slowing it now if the user struggles too much during the playthrough.
 
 ### Prerequisites
 
